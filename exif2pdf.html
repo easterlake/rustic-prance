@@ -2,23 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>File Info and EXIF Reader (Prettier JSON, Full-Width Thumbnail & PDF Export)</title>
+  <title>File Info and EXIF Reader (Full-Width Thumbnail & PDF Export)</title>
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/caldwell/renderjson/renderjson.js"></script>
   <style>
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: #f6f8fa;
-      color: #222;
-      margin: 0;
-      padding: 0 0 3em 0;
-    }
-    h2, h3 {
-      color: #1a73e8;
-      margin-left: 1em;
-    }
+    body { font-family: Arial, sans-serif; background: #f6f8fa; }
     .thumbnail-container {
       margin-bottom: 1em;
       width: 100%;
@@ -27,9 +17,9 @@
       margin-right: auto;
     }
     .thumbnail {
-      border: 2px solid #dadada;
+      border: 2px solid #444;
       border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
       width: 100%;
       height: auto;
       display: block;
@@ -38,72 +28,41 @@
       background: #fff;
     }
     pre, .json-output {
-      background: #f4f4f4;
-      color: #222;
+      background: #23272e;
+      color: #f8f8f2;
       padding: 1em;
       border-radius: 6px;
       overflow-x: auto;
       font-size: 1em;
       line-height: 1.5;
-      margin: 1em;
-      margin-top: 0.5em;
       margin-bottom: 1em;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
     }
     .json-output {
-      margin: 0 1em 1em 1em;
-      border: none;
-      background: #f4f4f4;
-      color: inherit;
-      padding: 1em;
       font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace;
+      margin: 0;
+      border: none;
+      background: #23272e;
+      color: #f8f8f2;
+      padding: 1em;
     }
-    /* Prettier JSON styling for renderjson */
-    .renderjson a { text-decoration: none; }
-    .renderjson .disclosure {
-      color: #1a73e8;
-      font-size: 120%;
-      cursor: pointer;
-      font-weight: bold;
-      margin-right: 2px;
-    }
-    .renderjson .syntax {
-      color: #bdbdbd;
-    }
-    .renderjson .string {
-      color: #43a047;
-    }
-    .renderjson .number {
-      color: #fbc02d;
-    }
-    .renderjson .boolean {
-      color: #e53935;
-    }
-    .renderjson .key {
-      color: #1e88e5;
-      font-weight: bold;
-    }
-    .renderjson .keyword {
-      color: #8e24aa;
-      font-style: italic;
-    }
-    .renderjson .object.syntax {
-      color: #00897b;
-    }
-    .renderjson .array.syntax {
-      color: #3949ab;
-    }
-    .renderjson .more {
-      color: #e53935;
-      cursor: pointer;
-      font-weight: bold;
-    }
+    /* Enhanced JSON styling for renderjson */
+    .renderjson-key        { color: #268bd2; font-weight: bold; }
+    .renderjson-string     { color: #2aa198; }
+    .renderjson-number     { color: #b58900; }
+    .renderjson-boolean    { color: #cb4b16; }
+    .renderjson-null       { color: #d33682; }
+    .renderjson-mark       { background: #44475a; }
+    .renderjson-link       { color: #6c71c4; text-decoration: underline; }
+    .renderjson-toggle     { color: #ff6188; cursor: pointer; font-weight: bold; }
+    .renderjson-separator  { color: #839496; }
+    .renderjson-object     { color: #859900; }
+    .renderjson-array      { color: #b58900; }
+    .renderjson-more       { color: #cb4b16; cursor: pointer; }
     button {
       margin-top: 1em;
-      margin-left: 1em;
       padding: 0.5em 1em;
       font-size: 1em;
-      background: #1a73e8;
+      background: #268bd2;
       color: #fff;
       border: none;
       border-radius: 4px;
@@ -112,14 +71,6 @@
     }
     button:hover {
       background: #155ab6;
-    }
-    input[type="file"] {
-      margin: 1em;
-      color: #222;
-      background: #fff;
-      border: 1px solid #dadada;
-      border-radius: 4px;
-      padding: 0.5em;
     }
   </style>
 </head>
@@ -131,11 +82,11 @@
   </div>
   <h3>File Info</h3>
   <pre id="fileInfo"></pre>
+  <button id="downloadPdf" style="display:none;">Download PDF</button>
   <h3>MD5 Hash</h3>
   <pre id="md5"></pre>
   <h3>EXIF Data</h3>
   <div id="exif" class="json-output"></div>
-  <button id="downloadPdf" style="display:none;">Download PDF</button>
 
   <script>
     let lastFileInfo = '';
@@ -202,45 +153,96 @@
 
     document.getElementById('downloadPdf').addEventListener('click', function() {
       const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
+      const doc = new jsPDF({ unit: 'mm', format: 'a4' });
 
-      let y = 10;
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 10;
+      let y = 20;
+
+      // Header: Date/time generated
+      const now = new Date();
+      const dateStr = now.toLocaleString();
+      doc.setFontSize(10);
+      doc.text(`Generated: ${dateStr}`, margin, 10);
+
       doc.setFont("courier", "normal");
       doc.setFontSize(12);
 
-      // Add thumbnail if available (fit to page width, keeping aspect ratio)
-      if (lastThumbnailDataUrl) {
-        doc.text("Thumbnail:", 10, y);
-        y += 5;
-        // For PDF, fit image to page width (max 190mm), keep aspect ratio
-        doc.addImage(lastThumbnailDataUrl, 'JPEG', 10, y, 190, 0);
-        y += 60; // Move down (adjust as needed)
+      // Add thumbnail if available (wait for image to load, then add)
+      function addContentAndSave(imgWidth, imgHeight) {
+        let yPos = y;
+        if (lastThumbnailDataUrl && imgWidth && imgHeight) {
+          doc.text("Thumbnail:", margin, yPos);
+          yPos += 5;
+          // Fit to page width, keep aspect ratio
+          const maxWidth = pageWidth - 2 * margin;
+          const scale = Math.min(1, maxWidth / imgWidth);
+          const drawWidth = imgWidth * scale;
+          const drawHeight = imgHeight * scale;
+          doc.addImage(lastThumbnailDataUrl, 'JPEG', margin, yPos, drawWidth, drawHeight);
+          yPos += drawHeight + 5;
+        }
+
+        doc.text("File Info:", margin, yPos);
+        yPos += 7;
+        lastFileInfo.split('\n').forEach(line => {
+          doc.text(line, margin + 2, yPos);
+          yPos += 7;
+        });
+
+        doc.text("MD5 Hash:", margin, yPos);
+        yPos += 7;
+        doc.text(lastMd5, margin + 2, yPos);
+        yPos += 10;
+
+        doc.text("EXIF Data:", margin, yPos);
+        yPos += 7;
+
+        // Stringify and split EXIF JSON for multi-line output
+        const exifStr = JSON.stringify(lastExif, null, 2);
+        exifStr.split('\n').forEach(line => {
+          if (yPos > pageHeight - 20) { // Reserve space for footer
+            doc.addPage();
+            yPos = 20;
+            doc.setFontSize(10);
+            doc.text(`Generated: ${dateStr}`, margin, 10);
+            doc.setFontSize(12);
+            doc.text("EXIF Data (cont'd):", margin, yPos);
+            yPos += 7;
+          }
+          doc.text(line, margin + 2, yPos);
+          yPos += 6;
+        });
+
+        // Footer: Page X of Y
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+          doc.setPage(i);
+          doc.setFontSize(10);
+          doc.text(
+            `Page ${i} of ${pageCount}`,
+            pageWidth - margin,
+            pageHeight - 7,
+            { align: 'right' }
+          );
+        }
+        doc.save("file_info.pdf");
       }
 
-      doc.text("File Info:", 10, y);
-      y += 7;
-      lastFileInfo.split('\n').forEach(line => {
-        doc.text(line, 12, y);
-        y += 7;
-      });
-
-      doc.text("MD5 Hash:", 10, y);
-      y += 7;
-      doc.text(lastMd5, 12, y);
-      y += 10;
-
-      doc.text("EXIF Data:", 10, y);
-      y += 7;
-
-      // Stringify and split EXIF JSON for multi-line output
-      const exifStr = JSON.stringify(lastExif, null, 2);
-      exifStr.split('\n').forEach(line => {
-        if (y > 280) { doc.addPage(); y = 10; }
-        doc.text(line, 12, y);
-        y += 6;
-      });
-
-      doc.save("file_info.pdf");
+      if (lastThumbnailDataUrl) {
+        const img = new window.Image();
+        img.onload = function() {
+          addContentAndSave(img.naturalWidth, img.naturalHeight);
+        };
+        img.onerror = function() {
+          // Fallback: skip thumbnail
+          addContentAndSave(0, 0);
+        };
+        img.src = lastThumbnailDataUrl;
+      } else {
+        addContentAndSave(0, 0);
+      }
     });
   </script>
 </body>
