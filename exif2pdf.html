@@ -249,21 +249,63 @@
       doc.text(state.md5, margin + 2, y);
       y += 10;
 
+      const maxLineWidth = pageWidth - margin * 2; // Adjust for your margins
+      
       doc.text("EXIF Data:", margin, y);
       y += 7;
       const exifStr = JSON.stringify(state.exif, null, 2);
+      
+      let inMakerNote = false;
+      let makerNoteBuffer = '';
+      
       exifStr.split('\n').forEach(line => {
-        if (y > pageHeight - 20) {
-          doc.addPage();
-          y = 20;
-          doc.setFontSize(10);
-          doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
-          doc.setFontSize(12);
-          doc.text("EXIF Data (cont'd):", margin, y);
-          y += 7;
+        // Check for the start of the MakerNote tag
+        if (!inMakerNote && line.trim().startsWith('"MakerNote":')) {
+          inMakerNote = true;
+          makerNoteBuffer = line.trim(); // Start with the key line
+          return; // Skip printing for now
         }
-        doc.text(line, margin + 2, y);
-        y += 6;
+        // If inside MakerNote, keep buffering lines
+        if (inMakerNote) {
+          makerNoteBuffer += ' ' + line.trim();
+          // MakerNote value ends with a closing quote and/or comma
+          if (line.trim().endsWith('"') || line.trim().endsWith('",')) {
+            // Wrap the MakerNote buffer
+            const wrappedLines = doc.splitTextToSize(makerNoteBuffer, maxLineWidth);
+            wrappedLines.forEach(wrappedLine => {
+              if (y > pageHeight - 20) {
+                doc.addPage();
+                y = 20;
+                doc.setFontSize(10);
+                doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
+                doc.setFontSize(12);
+                doc.text("EXIF Data (cont'd):", margin, y);
+                y += 7;
+              }
+              doc.text(wrappedLine, margin + 2, y);
+              y += 6;
+            });
+            inMakerNote = false;
+            makerNoteBuffer = '';
+          }
+          return; // Skip printing individual lines inside MakerNote
+        }
+      
+        // Wrap normal lines
+        const wrappedLines = doc.splitTextToSize(line, maxLineWidth);
+        wrappedLines.forEach(wrappedLine => {
+          if (y > pageHeight - 20) {
+            doc.addPage();
+            y = 20;
+            doc.setFontSize(10);
+            doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
+            doc.setFontSize(12);
+            doc.text("EXIF Data (cont'd):", margin, y);
+            y += 7;
+          }
+          doc.text(wrappedLine, margin + 2, y);
+          y += 6;
+        });
       });
 
       const pageCount = doc.internal.getNumberOfPages();
