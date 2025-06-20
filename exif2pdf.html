@@ -6,27 +6,17 @@
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/caldwell/renderjson/renderjson.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <!-- Highlight.js (light easy to read theme: idea-min) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/idea.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background: #f6f8fa; }
     .thumbnail-container { margin-bottom: 0.5em; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; }
     .thumbnail { border: 2px solid #444; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); width: 100%; height: auto; display: block; margin-bottom: 0.5em; object-fit: contain; background: #fff; }
     .export-buttons { display: flex; gap: 0.5em; margin-bottom: 1em; flex-wrap: wrap; }
-    pre, .json-output { background: #23272e; color: #f8f8f2; padding: 1em; border-radius: 6px; overflow-x: auto; font-size: 1em; line-height: 1.5; margin-bottom: 1em; }
-    .json-output { font-family: 'Fira Mono', 'Consolas', 'Menlo', monospace; margin: 0; border: none; background: #23272e; color: #f8f8f2; padding: 1em; }
-    .renderjson-key { color: #268bd2; font-weight: bold; }
-    .renderjson-string { color: #2aa198; }
-    .renderjson-number { color: #b58900; }
-    .renderjson-boolean { color: #cb4b16; }
-    .renderjson-null { color: #d33682; }
-    .renderjson-mark { background: #44475a; }
-    .renderjson-link { color: #6c71c4; text-decoration: underline; }
-    .renderjson-toggle { color: #ff6188; cursor: pointer; font-weight: bold; }
-    .renderjson-separator { color: #839496; }
-    .renderjson-object { color: #859900; }
-    .renderjson-array { color: #b58900; }
-    .renderjson-more { color: #cb4b16; cursor: pointer; }
+    pre { background: #fff; color: #24292e; padding: 1em; border-radius: 6px; overflow-x: auto; font-size: 1em; line-height: 1.5; margin-bottom: 1em; }
     button { padding: 0.5em 1em; font-size: 1em; background: #268bd2; color: #fff; border: none; border-radius: 4px; cursor: pointer; transition: background 0.2s; }
     button:hover { background: #155ab6; }
     .note { font-size: 0.95em; color: #888; margin-bottom: 1em; }
@@ -52,11 +42,9 @@
   <h3>MD5 Hash</h3>
   <pre id="md5"></pre>
   <h3>EXIF Data</h3>
-  <div id="exif" class="json-output"></div>
+  <div id="exif"></div>
 
   <script>
-    renderjson.set_show_to_level(2);
-
     const state = {
       file: null,
       fileInfo: '',
@@ -143,7 +131,6 @@
       });
     }
 
-    // Convert any image (EXIF or fallback) to a canvas Data URL for jsPDF
     function imageToCanvasDataUrl(imgDataUrl, maxW = 600, maxH = 600) {
       return new Promise(resolve => {
         const img = new window.Image();
@@ -163,6 +150,19 @@
       });
     }
 
+    // HTML escape function for JSON output
+    function escapeHtml(str) {
+      return str.replace(/[&<>"']/g, function(m) {
+        return ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#39;'
+        })[m];
+      });
+    }
+
     document.getElementById('fileInput').addEventListener('change', async function(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -170,15 +170,21 @@
       state.fileName = file.name ? file.name.replace(/\.[^/.]+$/, "") : 'image';
       state.fileInfo = `Name: ${file.name}\nSize: ${file.size} bytes\nType: ${file.type}`;
       document.getElementById('fileInfo').textContent = state.fileInfo;
-
       state.md5 = await computeMD5(file);
       document.getElementById('md5').textContent = state.md5;
 
       const dataUrl = await readFileAsync(file, 'DataURL');
       const { exif, exifThumbUrl } = await extractExifAndThumbnail(dataUrl);
       state.exif = exif;
-      document.getElementById('exif').innerHTML = '';
-      document.getElementById('exif').appendChild(renderjson(state.exif));
+
+      // Show EXIF as pretty JSON using highlight.js, with HTML escaping
+      const exifDiv = document.getElementById('exif');
+      const exifJsonStr = JSON.stringify(state.exif, null, 2);
+      exifDiv.innerHTML = `<pre><code class="json">${escapeHtml(exifJsonStr)}</code></pre>`;
+      const codeBlock = exifDiv.querySelector('code');
+      if (window.hljs && codeBlock) {
+        hljs.highlightElement(codeBlock);
+      }
 
       const imgEl = document.getElementById('thumbnail');
       const thumbNote = document.getElementById('thumbnote');
@@ -199,7 +205,7 @@
       showExportButtons(true);
     });
 
-    // ---- FIXED PDF EXPORT ----
+    // ---- PDF EXPORT ----
     async function generatePdfBlob() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: 'mm', format: 'a4' });
@@ -210,7 +216,6 @@
       const now = new Date();
       const dateStr = now.toLocaleString();
 
-      // Header with domain and file name
       doc.setFontSize(10);
       const domain = window.location.hostname || 'localhost';
       doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
@@ -218,7 +223,6 @@
       doc.setFont("courier", "normal");
       doc.setFontSize(12);
 
-      // Ensure the image is loaded and converted to a canvas Data URL before adding to PDF!
       let imgData = null, imgW = 0, imgH = 0;
       if (state.thumbnailDataUrl) {
         const imgCanvasData = await imageToCanvasDataUrl(state.thumbnailDataUrl, pageWidth - 2 * margin, 100);
@@ -233,7 +237,6 @@
         }
       }
 
-      // File Info, MD5, EXIF (unchanged)
       doc.text("File Info:", margin, y);
       y += 7;
       state.fileInfo.split('\n').forEach(line => {
@@ -263,7 +266,6 @@
         y += 6;
       });
 
-      // Footer
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
