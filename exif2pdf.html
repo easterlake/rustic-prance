@@ -3,1074 +3,937 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON/EXIF Viewer</title>
-    <!-- Tailwind CSS CDN -->
+    <title>EXIF & Metadata Viewer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- External libraries for local file processing and reporting -->
     <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/blueimp-md5/2.19.0/js/md5.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <!-- Highlight.js for code formatting, although the custom tree viewer is now used for JSON -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/idea.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/json.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Marked.js for robust markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Custom styles for Inter font and general aesthetics */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Align to the top */
-            min-height: 100vh;
-            margin: 0;
-            padding: 2rem; /* Add padding for better spacing */
         }
-        .container {
-            background-color: #ffffff;
-            padding: 2.5rem;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 48rem;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem; /* Increased space between sections */
-        }
-        input[type="text"] {
-            padding: 0.75rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            width: 100%;
-            box-sizing: border-box;
-            transition: border-color 0.2s ease-in-out;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
-        }
-        button {
-            background-color: #2563eb;
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        button:hover {
-            background-color: #1d4ed8;
-            transform: translateY(-1px);
-        }
-        button:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .content-display {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1.25rem;
-            min-height: 8rem;
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            color: #374151;
-            overflow-x: auto;
-        }
-        .error-message {
-            color: #ef4444;
-            font-weight: 500;
-        }
-        .loading-message {
-            color: #4f46e5;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .summary-container, .explanation-container, .image-container {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            border-radius: 0.75rem;
-            background-color: #e2e8f0;
-            font-family: 'Inter', sans-serif;
-            color: #1f2937;
-        }
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.75rem;
-            margin-top: 1rem;
-        }
-        .gemini-api-button {
-            background-color: #a78bfa;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .gemini-api-button:hover {
-            background-color: #8b5cf6;
-        }
-        /* Styles for local file thumbnail and download buttons */
-        .thumbnail-container {
-            margin-bottom: 1rem;
-            border-radius: 0.75rem;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-            background: #fff;
-        }
-        .thumbnail {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: contain;
-            background: #fff;
-            padding: 1rem;
-        }
-        .export-buttons button {
-            background-color: #268bd2;
-            color: #fff;
-            padding: 0.5em 1em;
-            font-size: 1em;
-            border-radius: 0.5rem;
-        }
-        .export-buttons button:hover {
-            background: #155ab6;
-        }
-        /* JSON Tree View Specific Styles */
-        .json-tree ul {
-            list-style-type: none;
-            padding-left: 1.5em;
-            margin: 0;
-        }
-        .json-tree li {
-            position: relative;
-            line-height: 1.5;
-        }
-        .json-tree .key {
-            color: #881a88;
-            font-weight: bold;
-            margin-right: 0.5em;
-        }
-        .json-tree .string {
-            color: #008000;
-        }
-        .json-tree .number {
-            color: #1a0dab;
-        }
-        .json-tree .boolean {
-            color: #0000ff;
-        }
-        .json-tree .null {
-            color: #808080;
-        }
-        .json-tree .collapsible {
-            cursor: pointer;
-        }
-        .json-tree .collapsible::before {
-            content: '►';
-            display: inline-block;
-            width: 1em;
-            margin-right: 0.2em;
-            transition: transform 0.1s ease-in-out;
-        }
-        .json-tree .collapsible.expanded::before {
-            content: '▼';
-            transform: rotate(0deg);
-        }
-        .json-tree .collapsible-content {
-            display: none;
-        }
-        .json-tree .collapsible.expanded + .collapsible-content {
-            display: block;
-        }
-        .json-tree .array-length, .json-tree .object-keys {
-            color: #808080;
-            font-size: 0.8em;
-            margin-left: 0.5em;
-        }
-        .collapsible-string-wrapper {
-            display: inline-flex;
-            align-items: flex-start;
-        }
-        .collapsible-string-toggle {
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            color: #008000;
-        }
-        .collapsible-string-toggle .toggle-arrow {
-            content: '►';
-            display: inline-block;
-            width: 1em;
-            margin-right: 0.2em;
-            transition: transform 0.1s ease-in-out;
-        }
-        .collapsible-string-toggle.expanded .toggle-arrow {
-            content: '▼';
-            transform: rotate(0deg);
-        }
-        .truncated-text {
-            font-style: italic;
-            color: #808080;
-        }
-        .full-string-content {
-            display: none;
-            margin-left: 1.5em;
-            word-break: break-all;
+        pre {
             white-space: pre-wrap;
+            word-wrap: break-word;
         }
-        .full-string-content.expanded {
+        .toast {
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .explanation-container {
+            display: none;
+        }
+        .explanation-container.expanded {
             display: block;
-        }
-        .explain-key-button {
-            cursor: pointer;
-            color: #a78bfa;
-            font-size: 1.25rem;
-            margin-left: 0.5rem;
-        }
-        .loading-dots span {
-            animation: bounce 1s infinite;
-        }
-        .loading-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        .loading-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        @keyframes bounce {
-            0%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-0.5rem);
-            }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">JSON & EXIF Data Viewer</h1>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-8">
 
-        <!-- Input methods section -->
-        <div class="flex flex-col md:flex-row gap-6">
-            <!-- Fetch by Object ID -->
-            <div class="flex-1 p-6 bg-gray-50 border border-gray-200 rounded-xl flex flex-col gap-4">
-                <label for="objectId" class="text-gray-700 text-lg font-medium">1. Fetch by Object ID:</label>
-                <input type="text" id="objectId" placeholder="e.g., 12345">
-                <button onclick="fetchAndDisplayContent()">Fetch & Display</button>
-            </div>
-            
-            <!-- Or selector -->
-            <div class="relative flex-none hidden md:flex items-center justify-center text-gray-400">
-                <span class="absolute px-2 bg-white text-sm">OR</span>
-                <div class="absolute w-full h-px bg-gray-300 -z-10"></div>
-            </div>
+<div class="container mx-auto max-w-7xl bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 md:p-10">
+    <h1 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">
+        EXIF & Metadata Viewer
+    </h1>
 
-            <!-- Select Local File -->
-            <div class="flex-1 p-6 bg-gray-50 border border-gray-200 rounded-xl flex flex-col gap-4">
-                <label for="fileInput" class="text-gray-700 text-lg font-medium">2. Select an image file:</label>
-                <input type="file" id="fileInput" accept="image/*">
-            </div>
+    <!-- Input Sections -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <!-- File 1 Section -->
+        <div class="p-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex flex-col gap-4">
+            <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300">File 1</h2>
+            <input type="file" id="file1-input" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+            <button id="display-file1-btn" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Display Local File 1</button>
         </div>
 
-        <!-- Display section -->
-        <div id="resultsSection" class="hidden">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">Results</h2>
-
-            <!-- Local file thumbnail display -->
-            <div id="thumbnailDisplay" class="thumbnail-container hidden">
-                <img id="thumbnail" class="thumbnail" alt="Image Thumbnail Preview">
-                <p id="thumbnote" class="note text-sm text-gray-500 text-center"></p>
-            </div>
-
-            <!-- Report download buttons from user's code -->
-            <div id="exportButtons" class="mt-4 flex flex-wrap gap-2">
-                <button id="downloadPdf" style="display:none;">Download PDF</button>
-                <button id="downloadCsv" style="display:none;">Download CSV</button>
-                <button id="downloadTxt" style="display:none;">Download TXT</button>
-                <button id="downloadJson" style="display:none;">Download JSON</button>
-                <button id="downloadZip" style="display:none;">Download ZIP</button>
-            </div>
-
-            <!-- Gemini API features buttons -->
-            <div id="geminiApiButtons" class="mt-4 flex flex-wrap gap-2">
-                <button id="summarizeButton" class="gemini-api-button" disabled onclick="summarizeJson()">Summarize JSON ✨</button>
-                <button id="generateImageButton" class="gemini-api-button" disabled onclick="generateImageFromExif()">Generate Image from EXIF ✨</button>
-            </div>
-
-            <!-- File Info, MD5, and EXIF sections -->
-            <div id="fileInfoSection" class="mt-6">
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">File Info</h3>
-                <div id="fileInfo" class="content-display"></div>
-            </div>
-            
-            <div id="md5Section" class="mt-6">
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">MD5 Hash</h3>
-                <div id="md5" class="content-display"></div>
-            </div>
-
-            <div id="exifSection" class="mt-6">
-                <h3 class="text-xl font-semibold text-gray-700 mb-2">EXIF Data</h3>
-                <div id="exifContent" class="content-display">
-                    <p class="text-gray-500">EXIF data will be displayed here.</p>
-                </div>
-            </div>
+        <!-- File 2 Section -->
+        <div class="p-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex flex-col gap-4">
+            <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300">File 2</h2>
+            <input type="file" id="file2-input" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+            <button id="display-file2-btn" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Display Local File 2</button>
         </div>
 
-        <!-- Gemini API output containers -->
-        <div id="summaryContainer" class="summary-container hidden"></div>
-        <div id="explanationContainer" class="explanation-container hidden"></div>
-        <div id="imageContainer" class="image-container hidden"></div>
+        <!-- JSON API Section -->
+        <div class="p-6 col-span-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex flex-col gap-4">
+            <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300">JSON API</h2>
+            <input type="url" id="json-url-input" placeholder="Enter JSON API URL..." value="https://jsonplaceholder.typicode.com/posts/1" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="load-json-btn" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Load JSON Data</button>
+                <button id="display-json-btn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Display Loaded JSON</button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // Define the base URL for your API endpoint
-        const BASE_API_URL = 'https://web-imiusi338c8b.up-de-fra1-k8s-1.apps.run-on-seenode.com/get-exif';
-        let currentData = null; // Variable to hold the fetched JSON data
-        let state = { // Unified state object for file info and EXIF data
-            file: null,
-            fileInfo: '',
-            md5: '',
-            exif: {},
-            thumbnailDataUrl: '',
-            thumbnailType: '', // 'exif' or 'full'
-            fileName: 'image'
-        };
+    <!-- Main Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 mb-8">
+        <button id="compare-files-btn" class="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">Compare Files</button>
+    </div>
 
-        const API_KEY = ""; // Gemini API key
+    <!-- Report Download Section -->
+    <div class="p-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl mb-8">
+        <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300 mb-4">Download Reports (for current view)</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <button id="download-txt-btn" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">TXT</button>
+            <button id="download-csv-btn" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">CSV</button>
+            <button id="download-pdf-btn" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">PDF</button>
+            <button id="download-zip-btn" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors">ZIP</button>
+        </div>
+    </div>
+    
+    <!-- Results Section -->
+    <div id="results-container" class="mt-8 hidden">
+        <!-- Search Bar -->
+        <div class="relative mb-6">
+            <input type="text" id="search-input" placeholder="Search EXIF data..." class="w-full px-4 py-2 pr-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 112 8z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+        </div>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+            <h2 id="viewer-title" class="text-2xl font-bold mb-4 text-gray-800 dark:text-white"></h2>
+            <div id="metadata-viewer-container" class="mb-6"></div>
+            <div id="exif-viewer-container" class="flex flex-col space-y-4 divide-y divide-gray-200 dark:divide-gray-700">
+                <!-- Data will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Toast Notification -->
+    <div id="toast-container" class="fixed toast hidden p-4"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    // --- State Variables ---
+    const state = {
+        file1: { file: null, metadata: {}, exif: {} },
+        file2: { file: null, metadata: {}, exif: {} },
+        jsonData: null,
+        currentMode: 'none', // 'single1', 'single2', 'compare', 'json'
+    };
+
+    // --- DOM Elements ---
+    const file1Input = document.getElementById('file1-input');
+    const file2Input = document.getElementById('file2-input');
+    const jsonUrlInput = document.getElementById('json-url-input');
+    const displayFile1Btn = document.getElementById('display-file1-btn');
+    const displayFile2Btn = document.getElementById('display-file2-btn');
+    const loadJsonBtn = document.getElementById('load-json-btn');
+    const displayJsonBtn = document.getElementById('display-json-btn');
+    const compareFilesBtn = document.getElementById('compare-files-btn');
+    const downloadTxtBtn = document.getElementById('download-txt-btn');
+    const downloadCsvBtn = document.getElementById('download-csv-btn');
+    const downloadPdfBtn = document.getElementById('download-pdf-btn');
+    const downloadZipBtn = document.getElementById('download-zip-btn');
+    const resultsContainer = document.getElementById('results-container');
+    const viewerTitle = document.getElementById('viewer-title');
+    const metadataViewerContainer = document.getElementById('metadata-viewer-container');
+    const exifViewerContainer = document.getElementById('exif-viewer-container');
+    const searchInput = document.getElementById('search-input');
+    const toastContainer = document.getElementById('toast-container');
+
+    // --- Utility Functions ---
+
+    // A function to handle API calls with exponential backoff for retries and a timeout.
+    async function fetchWithTimeout(url, options = {}, retries = 5, timeout = 10000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
         
-        // Reusable HTML for a loading message with an ellipsis animation
-        const loadingMessageHtml = (text) => `
-            <p class="loading-message">
-                ${text}
-                <span class="loading-dots">
-                    <span>.</span><span>.</span><span>.</span>
-                </span>
-            </p>
+        try {
+            const response = await fetch(url, { ...options, signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch from ${url} with status ${response.status}`);
+            }
+            return response;
+        } catch (error) {
+            clearTimeout(timeoutId);
+            console.error(`Fetch attempt failed for ${url} (Retries left: ${retries}):`, error);
+            
+            if (error.name === 'AbortError') {
+                throw new Error('API request timed out.');
+            }
+            
+            if (retries > 0) {
+                const delay = Math.pow(2, 5 - retries) * 1000;
+                console.warn(`Retrying in ${delay / 1000}s...`);
+                await new Promise(res => setTimeout(res, delay));
+                return fetchWithTimeout(url, options, retries - 1, timeout);
+            } else {
+                throw error;
+            }
+        }
+    }
+
+    // Displays a temporary, dismissible toast notification.
+    const showMessage = (text) => {
+        toastContainer.innerHTML = `
+            <div class="flex items-center justify-between p-4 bg-gray-900 text-white rounded-lg shadow-xl animate-fade-in-up">
+                <p class="mr-4">${text}</p>
+                <button class="text-white hover:text-gray-300" onclick="this.parentElement.parentElement.classList.add('hidden')">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+        `;
+        toastContainer.classList.remove('hidden');
+        setTimeout(() => {
+            toastContainer.classList.add('hidden');
+        }, 5000);
+    };
+    
+    // Calculates SHA-256 hash of a file using the Web Crypto API
+    const getSha256Hash = async (file) => {
+        try {
+            const buffer = await file.arrayBuffer();
+            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const sha256Hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return sha256Hash;
+        } catch (e) {
+            console.error("SHA-256 hash calculation failed:", e);
+            return 'Failed to calculate hash';
+        }
+    };
+    
+    // Gets basic file metadata
+    const getFileMetadata = async (file) => {
+        if (!file) return {};
+        return {
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            sha256: await getSha256Hash(file),
+        };
+    };
+
+    // Calls the Gemini API to get an explanation for an EXIF tag.
+    const getExplanation = async (tagName, tagValue, explanationDiv) => {
+        // Show a loading state
+        explanationDiv.innerHTML = `<p class="italic">Generating explanation...</p>`;
+        
+        const prompt = `Explain the EXIF tag named "${tagName}" with the value "${tagValue}". Provide a concise, easy-to-understand explanation for a photography enthusiast. Use markdown for formatting, including bold, italics, or bullet points where appropriate. Ensure there is a blank line between each paragraph to improve readability.`;
+        try {
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = ""; // API key will be provided at runtime
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const response = await fetchWithTimeout(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (result.candidates && result.candidates.length > 0) {
+                // Use marked.js to convert the markdown content
+                const formattedHtml = marked.parse(result.candidates[0].content.parts[0].text);
+                explanationDiv.innerHTML = formattedHtml;
+            } else {
+                explanationDiv.innerHTML = `<p class="text-red-500">Sorry, I couldn't generate an explanation.</p>`;
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            explanationDiv.innerHTML = `<p class="text-red-500">An error occurred while generating the explanation.</p>`;
+        }
+    };
+    
+    // Calls the Gemini API for a comparison explanation.
+    const getComparisonExplanation = async (tagName, value1, value2, explanationDiv) => {
+        // Show a loading state
+        explanationDiv.innerHTML = `<p class="italic">Generating explanation...</p>`;
+        
+        const prompt = `Explain the EXIF tag named "${tagName}" in the context of image metadata comparison, with values "${value1}" and "${value2}". Highlight the differences if any. Provide a concise, easy-to-understand explanation. Use markdown for formatting, including bold, italics, or bullet points where appropriate. Ensure there is a blank line between each paragraph to improve readability.`;
+        try {
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const response = await fetchWithTimeout(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            if (result.candidates && result.candidates.length > 0) {
+                // Use marked.js to convert the markdown content
+                const formattedHtml = marked.parse(result.candidates[0].content.parts[0].text);
+                explanationDiv.innerHTML = formattedHtml;
+            } else {
+                explanationDiv.innerHTML = `<p class="text-red-500">Sorry, I couldn't generate an explanation.</p>`;
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            explanationDiv.innerHTML = `<p class="text-red-500">An error occurred while generating the explanation.</p>`;
+        }
+    };
+
+
+    // Normalizes a string for case-insensitive, space-agnostic searching.
+    const normalizeString = (str) => String(str).toLowerCase().replace(/\s/g, '');
+
+    // Renders a single EXIF tag entry.
+    const renderExifTag = (tagName, tagValue) => {
+        const tagDiv = document.createElement('div');
+        tagDiv.className = 'flex flex-col py-2 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200';
+        
+        const isMakerNote = tagName === "MakerNote";
+        const displayValue = (typeof tagValue === 'object' && tagValue !== null) ? JSON.stringify(tagValue, null, 2) : String(tagValue);
+        
+        tagDiv.innerHTML = `
+            <div class="flex items-start justify-between">
+                <div class="flex items-center space-x-2 w-1/3">
+                    <span class="font-semibold text-gray-800 dark:text-gray-100">${tagName}</span>
+                    <button class="explain-btn flex items-center text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200 rounded-full px-2 py-1 bg-indigo-100 dark:bg-indigo-900">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Explain
+                    </button>
+                </div>
+                <div class="w-2/3 break-words text-sm text-gray-600 dark:text-gray-300">
+                    ${isMakerNote ? `
+                        <div class="maker-note-collapsed">
+                            <pre>[MakerNote data is large and complex.]</pre>
+                            <button class="toggle-maker-note text-indigo-500 hover:underline mt-1">Expand</button>
+                        </div>
+                        <div class="maker-note-expanded hidden">
+                            <button class="toggle-maker-note text-indigo-500 hover:underline mb-2">Collapse</button>
+                            <pre>${displayValue}</pre>
+                        </div>
+                    ` : `
+                        <pre class="whitespace-pre-wrap">${displayValue}</pre>
+                    `}
+                </div>
+            </div>
+            <div class="explanation-container"></div>
         `;
 
-        /**
-         * Retries a fetch request with exponential backoff.
-         * @param {string} url - The URL to fetch.
-         * @param {object} options - Fetch options.
-         * @param {number} retries - Number of retries left.
-         */
-        async function fetchWithBackoff(url, options, retries = 5) {
-            try {
-                const response = await fetch(url, options);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response;
-            } catch (error) {
-                if (retries > 0) {
-                    const delay = Math.pow(2, 5 - retries) * 1000;
-                    console.warn(`Retrying in ${delay / 1000}s...`);
-                    await new Promise(res => setTimeout(res, delay));
-                    return fetchWithBackoff(url, options, retries - 1);
-                } else {
-                    throw error;
-                }
-            }
-        }
-
-        /**
-         * Converts basic Markdown to HTML.
-         * @param {string} markdownText - The text with Markdown to format.
-         * @returns {string} The HTML string.
-         */
-        function formatMarkdown(markdownText) {
-            // Convert newlines to <br> for proper line breaks
-            let html = markdownText.replace(/\n/g, '<br>');
-            // Bold (**text**)
-            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Italic (*text*)
-            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
-            return html;
-        }
-
-        /**
-         * Fetches JSON content from the constructed URL using the Object ID and displays it.
-         */
-        async function fetchAndDisplayContent() {
-            const objectIdInput = document.getElementById('objectId');
-            const contentDisplay = document.getElementById('exifContent');
-            const objectId = objectIdInput.value.trim();
-
-            // Clear previous results and show loading state immediately
-            resetDisplay();
-            contentDisplay.innerHTML = loadingMessageHtml('Fetching data');
-            document.getElementById('resultsSection').classList.remove('hidden');
-
-            if (!objectId) {
-                contentDisplay.innerHTML = '<p class="error-message">Please enter an Object ID.</p>';
+        const explainBtn = tagDiv.querySelector('.explain-btn');
+        explainBtn.addEventListener('click', async () => {
+            let explanationDiv = tagDiv.querySelector('.explanation-container');
+            
+            // Check if the explanation div is already there and toggle
+            if (explanationDiv.textContent.trim() !== '') {
+                explanationDiv.classList.toggle('expanded');
                 return;
             }
+
+            // If it doesn't exist, make the API call
+            explanationDiv.classList.add('expanded');
+            await getExplanation(tagName, tagValue, explanationDiv);
+        });
+        
+        const toggleButtons = tagDiv.querySelectorAll('.toggle-maker-note');
+        if (toggleButtons.length > 0) {
+            const collapsedDiv = tagDiv.querySelector('.maker-note-collapsed');
+            const expandedDiv = tagDiv.querySelector('.maker-note-expanded');
+            toggleButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    collapsedDiv.classList.toggle('hidden');
+                    expandedDiv.classList.toggle('hidden');
+                });
+            });
+        }
+        
+        return tagDiv;
+    };
+    
+    // Renders the file metadata section
+    const renderMetadata = (metadata, isComparison = false, metadata2 = null) => {
+        metadataViewerContainer.innerHTML = '';
+        const metadataDiv = document.createElement('div');
+        metadataDiv.className = 'flex flex-col space-y-4 mb-6';
+        
+        const metadataKeys = ['name', 'size', 'type', 'sha256'];
+        
+        metadataKeys.forEach(key => {
+            const metadataRow = document.createElement('div');
+            metadataRow.className = 'flex items-center py-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700';
             
-            // Use a slight delay to ensure the UI updates with the loading message
-            setTimeout(async () => {
-                const targetUrl = `${BASE_API_URL}/${encodeURIComponent(objectId)}`;
-                const proxyUrl = 'https://corsproxy.io/?';
-                const finalUrl = proxyUrl + encodeURIComponent(targetUrl);
-
-                try {
-                    const response = await fetch(finalUrl);
-                    if (!response.ok) {
-                        contentDisplay.innerHTML = `<p class="error-message">HTTP error! Status: ${response.status} - ${response.statusText}. It might be a CORS issue or the Object ID is invalid.</p>`;
-                        return;
-                    }
-                    const data = await response.json();
-                    state.exif = data;
-                    state.fileInfo = `Fetched from API\nObject ID: ${objectId}\nType: application/json`;
-                    state.md5 = 'N/A';
-                    state.thumbnailDataUrl = ''; // No thumbnail from API
-                    state.fileName = `object_${objectId}`;
-
-                    displayContent();
-                    
-                } catch (error) {
-                    contentDisplay.innerHTML = `<p class="error-message">Error fetching or parsing JSON: ${error.message}. This often happens due to network issues or Cross-Origin Resource Sharing (CORS) restrictions.</p>`;
-                    console.error("Fetch or JSON parsing error:", error);
-                    
-                }
-            }, 50); // Small delay to allow the browser to repaint
-        }
-        
-        /**
-         * Generates a summary of the current JSON data using the Gemini API.
-         */
-        async function summarizeJson() {
-            const summaryContainer = document.getElementById('summaryContainer');
-            summaryContainer.classList.remove('hidden');
-            summaryContainer.innerHTML = loadingMessageHtml('Generating summary');
-
-            try {
-                const prompt = `Summarize the following EXIF data in a human-readable format. Highlight key details like camera make, model, lens, exposure settings (ISO, aperture, shutter speed), and date taken:\n\n${JSON.stringify(currentData, null, 2)}`;
-                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                const payload = { contents: chatHistory };
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
-                
-                const response = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                const summary = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Failed to generate summary.";
-
-                summaryContainer.innerHTML = `
-                    <h3 class="text-xl font-bold mb-2">Summary ✨</h3>
-                    <p>${formatMarkdown(summary)}</p>
-                `;
-            } catch (error) {
-                summaryContainer.innerHTML = `<p class="error-message">Error generating summary: ${error.message}</p>`;
-                console.error("Gemini API error:", error);
-            }
-        }
-
-        /**
-         * Explains a specific JSON key and its value using the Gemini API.
-         * @param {string} key - The key to explain.
-         * @param {any} value - The value of the key.
-         */
-        async function explainJsonKey(key, value) {
-            const explanationContainer = document.getElementById('explanationContainer');
-            explanationContainer.classList.remove('hidden');
-            explanationContainer.innerHTML = loadingMessageHtml(`Explaining key "${key}"`);
-
-            try {
-                const prompt = `Explain what the EXIF key "${key}" means. If possible, provide context based on its value: "${JSON.stringify(value)}". Keep the explanation concise and easy to understand.`;
-                let chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
-                const payload = { contents: chatHistory };
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
-                const response = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                const result = await response.json();
-                const explanation = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Failed to get an explanation.";
-
-                explanationContainer.innerHTML = `
-                    <h3 class="text-xl font-bold mb-2">Explanation for "${key}" ✨</h3>
-                    <p>${formatMarkdown(explanation)}</p>
-                `;
-            } catch (error) {
-                explanationContainer.innerHTML = `<p class="error-message">Error explaining key: ${error.message}</p>`;
-                console.error("Gemini API error:", error);
-            }
-        }
-        
-        /**
-         * Generates an image using the Gemini API based on the EXIF data.
-         */
-        async function generateImageFromExif() {
-            const imageContainer = document.getElementById('imageContainer');
-            imageContainer.classList.remove('hidden');
-            imageContainer.innerHTML = loadingMessageHtml('Generating image from EXIF data');
-
-            try {
-                const promptFromExif = `Generate an image based on the following photo metadata:\n\n` +
-                    (currentData.Make ? `Camera Make: ${currentData.Make}\n` : '') +
-                    (currentData.Model ? `Camera Model: ${currentData.Model}\n` : '') +
-                    (currentData.LensModel ? `Lens Model: ${currentData.LensModel}\n` : '') +
-                    (currentData.DateTimeOriginal ? `Date Taken: ${currentData.DateTimeOriginal}\n` : '') +
-                    (currentData.ShutterSpeedValue ? `Shutter Speed: ${currentData.ShutterSpeedValue}\n` : '') +
-                    (currentData.ApertureValue ? `Aperture: f/${currentData.ApertureValue}\n` : '') +
-                    (currentData.ISO ? `ISO: ${currentData.ISO}\n` : '') +
-                    (currentData.ExposureProgram ? `Exposure Program: ${currentData.ExposureProgram}\n` : '') +
-                    `Describe a scene that might be captured with these settings and generate an image of it.`;
-                
-                const payload = { 
-                    instances: { prompt: promptFromExif },
-                    parameters: { "sampleCount": 1}
-                };
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${API_KEY}`;
-                
-                const response = await fetchWithBackoff(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-
-                const base64Data = result?.predictions?.[0]?.bytesBase64Encoded;
-
-                if (!base64Data) {
-                    imageContainer.innerHTML = `<p class="error-message">Failed to generate image. The API response was not in the expected format.</p>`;
-                    return;
-                }
-
-                const imageUrl = `data:image/png;base64,${base64Data}`;
-                imageContainer.innerHTML = `
-                    <h3 class="text-xl font-bold mb-2">Generated Image ✨</h3>
-                    <img src="${imageUrl}" alt="Generated from EXIF data">
-                `;
-
-            } catch (error) {
-                imageContainer.innerHTML = `<p class="error-message">Error generating image: ${error.message}</p>`;
-                console.error("Image Generation API error:", error);
-            }
-        }
-
-        /**
-         * Recursively renders JSON data into an expandable/collapsible HTML tree.
-         * @param {any} data - The JSON data to render.
-         * @param {string} keyName - The key name for the current data (used for display).
-         * @returns {string} The HTML string representation of the JSON data.
-         */
-        function renderJsonTree(data, keyName = null) {
-            let html = '';
-
-            if (data === null) {
-                html += `<li><span class="key">${keyName ? JSON.stringify(keyName) + ': ' : ''}</span><span class="null">null</span></li>`;
-            } else if (typeof data === 'object') {
-                const isArray = Array.isArray(data);
-                const count = isArray ? data.length : Object.keys(data).length;
-                const contentId = `json-content-${Math.random().toString(36).substring(2, 9)}`;
-
-                html += `<li>`;
-                html += `<span class="collapsible" onclick="toggleCollapse('${contentId}', this)">`;
-                html += `<span class="key">${keyName ? JSON.stringify(keyName) + ': ' : ''}</span>`;
-                html += `<span class="type-indicator">${isArray ? '[' : '{'}</span>`;
-                html += `<span class="${isArray ? 'array-length' : 'object-keys'}">${count} ${isArray ? 'items' : 'keys'}</span>`;
-                html += `<span class="type-indicator">${isArray ? ']' : '}'}</span>`;
-                html += `</span>`; // End collapsible span
-
-                html += `<ul id="${contentId}" class="collapsible-content">`;
-                if (isArray) {
-                    data.forEach((item, index) => {
-                        html += renderJsonTree(item, index);
-                    });
-                } else {
-                    for (const key in data) {
-                        if (Object.prototype.hasOwnProperty.call(data, key)) {
-                            html += renderJsonTree(data[key], key);
-                        }
-                    }
-                }
-                html += `</ul>`;
-                html += `</li>`;
-            } else {
-                let valueClass = '';
-                let displayValue = JSON.stringify(data);
-
-                if (typeof data === 'string') {
-                    valueClass = 'string';
-                    // Special handling for MakerNote string
-                    if (keyName === 'MakerNote' && data.includes('\u0000')) {
-                        const uniqueId = `makernote-content-${Math.random().toString(36).substring(2, 9)}`;
-                        html += `<li><span class="key">${JSON.stringify(keyName)}: </span>`;
-                        html += `<span class="collapsible-string-wrapper">`;
-                        html += `<span class="collapsible-string-toggle" onclick="toggleStringCollapse('${uniqueId}', this)">`;
-                        html += `<span class="toggle-arrow">►</span>`;
-                        html += `<span class="truncated-text">[...binary MakerNote data...]</span>`;
-                        html += `</span>`;
-                        html += `<div id="${uniqueId}" class="full-string-content">`;
-                        html += `<span class="string">${displayValue}</span>`;
-                        html += `</div>`;
-                        html += `</span></li>`;
-                        return html;
-                    }
-                } else if (typeof data === 'number') {
-                    valueClass = 'number';
-                } else if (typeof data === 'boolean') {
-                    valueClass = 'boolean';
-                }
-
-                html += `<li>
-                    <span class="key">${keyName ? JSON.stringify(keyName) + ': ' : ''}</span>
-                    <span class="${valueClass}">${displayValue}</span>
-                    <span class="explain-key-button" onclick="explainJsonKey('${keyName}', '${data}')">✨</span>
-                </li>`;
-            }
-
-            return html;
-        }
-
-        /**
-         * Toggles the visibility of collapsible JSON content (for objects/arrays).
-         * @param {string} contentId - The ID of the content element to toggle.
-         * @param {HTMLElement} triggerElement - The element that was clicked (e.g., the span with the arrow).
-         */
-        function toggleCollapse(contentId, triggerElement) {
-            const contentElement = document.getElementById(contentId);
-            if (contentElement) {
-                contentElement.classList.toggle('expanded');
-                triggerElement.classList.toggle('expanded');
-            }
-        }
-
-        /**
-         * Toggles the visibility of a collapsible string (e.g., MakerNote).
-         * @param {string} contentId - The ID of the full string content element.
-         * @param {HTMLElement} triggerElement - The element that was clicked (the toggle span).
-         */
-        function toggleStringCollapse(contentId, triggerElement) {
-            const contentElement = document.getElementById(contentId);
-            if (contentElement) {
-                contentElement.classList.toggle('expanded');
-                triggerElement.classList.toggle('expanded');
-            }
-        }
-
-        // --- Local File Processing Functions from user's code, adapted for this app ---
-
-        /**
-         * Converts an EXIF thumbnail (binary) to a data URL.
-         */
-        function exifThumbnailToDataURL(exifObj) {
-            if (exifObj && exifObj['Thumbnail']) {
-                let thumb = exifObj['Thumbnail'];
-                let binary = '';
-                if (thumb instanceof Uint8Array) {
-                    binary = String.fromCharCode.apply(null, thumb);
-                } else if (thumb instanceof ArrayBuffer) {
-                    binary = String.fromCharCode.apply(null, new Uint8Array(thumb));
-                } else if (typeof thumb === 'string') {
-                    binary = thumb;
-                }
-                if (binary.length > 0) {
-                    return 'data:image/jpeg;base64,' + btoa(binary);
-                }
-            }
-            return null;
-        }
-
-        /**
-         * Upscales an EXIF thumbnail for better display.
-         */
-        function upscaleThumbnail(dataUrl, targetWidth = 600, targetHeight = 600) {
-            return new Promise(resolve => {
-                const img = new window.Image();
-                img.onload = function() {
-                    let scale = Math.min(targetWidth / img.width, targetHeight / img.height, 1);
-                    let w = Math.round(img.width * scale);
-                    let h = Math.round(img.height * scale);
-                    const canvas = document.createElement('canvas');
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    resolve(canvas.toDataURL('image/jpeg'));
-                };
-                img.onerror = function() { resolve(dataUrl); };
-                img.src = dataUrl;
-            });
-        }
-        
-        /**
-         * Reads a file asynchronously.
-         */
-        function readFileAsync(file, type = 'DataURL') {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = e => resolve(e.target.result);
-                reader.onerror = reject;
-                if (type === 'ArrayBuffer') reader.readAsArrayBuffer(file);
-                else reader.readAsDataURL(file);
-            });
-        }
-
-        /**
-         * Computes the MD5 hash of a file.
-         */
-        async function computeMD5(file) {
-            const arrayBuffer = await readFileAsync(file, 'ArrayBuffer');
-            let binary = '';
-            const bytes = new Uint8Array(arrayBuffer);
-            for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
-            return md5(binary);
-        }
-
-        /**
-         * Extracts EXIF data and thumbnail from an image data URL.
-         */
-        async function extractExifAndThumbnail(dataUrl) {
-            return new Promise(resolve => {
-                const img = new Image();
-                img.onload = function() {
-                    EXIF.getData(img, function() {
-                        const exif = EXIF.getAllTags(this);
-                        let exifThumbUrl = exifThumbnailToDataURL(exif);
-                        resolve({ exif, exifThumbUrl });
-                    });
-                };
-                img.onerror = function() { resolve({ exif: {}, exifThumbUrl: null }); };
-                img.src = dataUrl;
-            });
-        }
-
-        /**
-         * Converts an image to a canvas data URL with specified dimensions.
-         */
-        function imageToCanvasDataUrl(imgDataUrl, maxW = 600, maxH = 600) {
-            return new Promise(resolve => {
-                const img = new window.Image();
-                img.onload = function() {
-                    let scale = Math.min(maxW / img.width, maxH / img.height, 1);
-                    let w = Math.round(img.width * scale);
-                    let h = Math.round(img.height * scale);
-                    const canvas = document.createElement('canvas');
-                    canvas.width = w;
-                    canvas.height = h;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, w, h);
-                    resolve({ dataUrl: canvas.toDataURL('image/jpeg'), width: w, height: h });
-                };
-                img.onerror = function() { resolve({ dataUrl: imgDataUrl, width: 0, height: 0 }); };
-                img.src = imgDataUrl;
-            });
-        }
-
-        /**
-         * Main function to handle file input change.
-         */
-        document.getElementById('fileInput').addEventListener('change', async function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Clear previous results and show loading state immediately
-            resetDisplay();
-            document.getElementById('exifContent').innerHTML = loadingMessageHtml('Reading local file');
-            document.getElementById('resultsSection').classList.remove('hidden');
-
-            try {
-                state.file = file;
-                state.fileName = file.name ? file.name.replace(/\.[^/.]+$/, "") : 'image';
-                state.fileInfo = `Name: ${file.name}\nSize: ${file.size} bytes\nType: ${file.type}`;
-                state.md5 = await computeMD5(file);
-
-                const dataUrl = await readFileAsync(file, 'DataURL');
-                const { exif, exifThumbUrl } = await extractExifAndThumbnail(dataUrl);
-                state.exif = exif;
-
-                if (exifThumbUrl) {
-                    state.thumbnailType = 'exif';
-                    state.thumbnailDataUrl = await upscaleThumbnail(exifThumbUrl, 600, 600);
-                } else {
-                    state.thumbnailType = 'full';
-                    state.thumbnailDataUrl = dataUrl;
-                }
-
-                displayContent();
-                
-            } catch (error) {
-                document.getElementById('exifContent').innerHTML = `<p class="error-message">Error processing file: ${error.message}</p>`;
-                console.error("File processing error:", error);
-            }
-        });
-
-        /**
-         * Updates the display with the data from the 'state' object.
-         */
-        function displayContent() {
-            document.getElementById('resultsSection').classList.remove('hidden');
-            document.getElementById('fileInfo').textContent = state.fileInfo;
-            document.getElementById('md5').textContent = state.md5;
-
-            // Update the global `currentData` for the Gemini API functions
-            currentData = state.exif;
+            let value1 = metadata[key] || 'N/A';
+            let value2 = metadata2 ? (metadata2[key] || 'N/A') : null;
             
-            // Display the thumbnail if available
-            const imgEl = document.getElementById('thumbnail');
-            const thumbNote = document.getElementById('thumbnote');
-            const thumbnailDisplay = document.getElementById('thumbnailDisplay');
-
-            if (state.thumbnailDataUrl) {
-                imgEl.src = state.thumbnailDataUrl;
-                thumbnailDisplay.classList.remove('hidden');
-                thumbNote.textContent = state.thumbnailType === 'exif'
-                    ? "Embedded EXIF thumbnail shown (upscaled)."
-                    : "No embedded EXIF thumbnail found; full image shown.";
-            } else {
-                thumbnailDisplay.classList.add('hidden');
+            // Format size for readability
+            if (key === 'size') {
+                value1 = formatBytes(value1);
+                if (value2) value2 = formatBytes(value2);
             }
 
-            // Render EXIF data in the tree viewer
-            const exifContentDiv = document.getElementById('exifContent');
-            const jsonTreeHtml = `<div class="json-tree"><ul>${renderJsonTree(state.exif)}</ul></div>`;
-            exifContentDiv.innerHTML = jsonTreeHtml;
+            if (isComparison) {
+                const isDifferent = value1 !== value2;
+                metadataRow.innerHTML = `
+                    <div class="flex items-start justify-between w-full">
+                        <span class="font-bold w-1/3">${key.charAt(0).toUpperCase() + key.slice(1)}:</span>
+                        <span class="w-1/3 text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</span>
+                        <span class="w-1/3 text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</span>
+                    </div>
+                `;
+            } else {
+                 metadataRow.innerHTML = `
+                    <span class="font-bold w-1/3">${key.charAt(0).toUpperCase() + key.slice(1)}:</span>
+                    <span class="w-2/3 text-gray-600 dark:text-gray-300">${value1}</span>
+                `;
+            }
+            metadataDiv.appendChild(metadataRow);
+        });
+        metadataViewerContainer.appendChild(metadataDiv);
+    };
 
-            // Enable all action buttons
-            toggleButtons(true);
+    // Helper function to format bytes for display
+    const formatBytes = (bytes, decimals = 2) => {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    };
+    
+    // Renders the EXIF comparison view.
+    const renderComparisonView = (searchQuery) => {
+        exifViewerContainer.innerHTML = '';
+        viewerTitle.innerText = 'EXIF Data Comparison';
+        searchInput.placeholder = 'Search EXIF data...';
+
+        renderMetadata(state.file1.metadata, true, state.file2.metadata);
+
+        const combinedExif = {};
+        const exif1 = state.file1.exif || {};
+        const exif2 = state.file2.exif || {};
+        const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
+
+        [...allKeys].sort().forEach(key => {
+            combinedExif[key] = [exif1[key], exif2[key]];
+        });
+
+        const filteredExifData = Object.entries(combinedExif).filter(([key, values]) => {
+            const normalizedSearch = normalizeString(searchQuery);
+            if (!normalizedSearch) return true;
+            const value1 = values[0] !== undefined ? String(values[0]) : '';
+            const value2 = values[1] !== undefined ? String(values[1]) : '';
+            return normalizeString(key).includes(normalizedSearch) || normalizeString(value1).includes(normalizedSearch) || normalizeString(value2).includes(normalizedSearch);
+        });
+
+        if (filteredExifData.length === 0) {
+            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
+            return;
         }
         
-        /**
-         * Clears the display and hides results/messages.
-         */
-        function resetDisplay() {
-            document.getElementById('resultsSection').classList.add('hidden');
-            document.getElementById('thumbnailDisplay').classList.add('hidden');
-            document.getElementById('fileInfo').textContent = '';
-            document.getElementById('md5').textContent = '';
-            document.getElementById('exifContent').innerHTML = '<p class="text-gray-500">EXIF data will be displayed here.</p>';
-            document.getElementById('summaryContainer').classList.add('hidden');
-            document.getElementById('explanationContainer').classList.add('hidden');
-            document.getElementById('imageContainer').classList.add('hidden');
-            toggleButtons(false);
-        }
+        // Render comparison header
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between text-sm text-gray-500 px-4 pt-2 font-bold';
+        header.innerHTML = `
+            <span class="w-1/3">Tag Name</span>
+            <span class="w-1/3 text-center">File 1</span>
+            <span class="w-1/3 text-center">File 2</span>
+        `;
+        exifViewerContainer.appendChild(header);
 
-        /**
-         * Enables or disables all action buttons.
-         */
-        function toggleButtons(enable) {
-            document.getElementById('summarizeButton').disabled = !enable;
-            document.getElementById('generateImageButton').disabled = !enable;
-            document.getElementById('downloadPdf').style.display = enable ? 'inline-block' : 'none';
-            document.getElementById('downloadCsv').style.display = enable ? 'inline-block' : 'none';
-            document.getElementById('downloadTxt').style.display = enable ? 'inline-block' : 'none';
-            document.getElementById('downloadJson').style.display = enable ? 'inline-block' : 'none';
-            document.getElementById('downloadZip').style.display = enable ? 'inline-block' : 'none';
-        }
+        filteredExifData.forEach(([key, values]) => {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'flex flex-col py-2 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200';
+            
+            const value1 = values[0] !== undefined ? (typeof values[0] === 'object' ? JSON.stringify(values[0], null, 2) : values[0]) : 'N/A';
+            const value2 = values[1] !== undefined ? (typeof values[1] === 'object' ? JSON.stringify(values[1], null, 2) : values[1]) : 'N/A';
+            const isDifferent = value1 !== value2;
+            const isMakerNote = key === 'MakerNote';
 
-        // --- PDF EXPORT from user's code ---
-        async function generatePdfBlob() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ unit: 'mm', format: 'a4' });
-            const pageWidth = 210;
-            const pageHeight = 297;
-            const margin = 10;
-            let y = 20;
-            const now = new Date();
-            const dateStr = now.toLocaleString();
-            doc.setFontSize(10);
-            const domain = window.location.hostname || 'localhost';
-            doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
-            doc.setFont("courier", "normal");
-            doc.setFontSize(12);
-            let imgData = null, imgW = 0, imgH = 0;
-            if (state.thumbnailDataUrl) {
-                const imgCanvasData = await imageToCanvasDataUrl(state.thumbnailDataUrl, pageWidth - 2 * margin, 100);
-                imgData = imgCanvasData.dataUrl;
-                imgW = imgCanvasData.width;
-                imgH = imgCanvasData.height;
-                if (imgData && imgW && imgH) {
-                    doc.text("Thumbnail:", margin, y);
-                    y += 5;
-                    doc.addImage(imgData, 'JPEG', margin, y, imgW, imgH);
-                    y += imgH + 5;
+            rowDiv.innerHTML = `
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center space-x-2 w-1/3">
+                        <span class="font-semibold">${key}</span>
+                        <button class="explain-btn flex items-center text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200 rounded-full px-2 py-1 bg-indigo-100 dark:bg-indigo-900">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Explain
+                        </button>
+                    </div>
+                    ${isMakerNote ? `
+                        <div class="w-1/3 text-sm break-words text-center">
+                            <div class="maker-note-collapsed-1">
+                                <span class="text-gray-600 dark:text-gray-300">[MakerNote]</span>
+                                <button class="toggle-maker-note-1 text-indigo-500 hover:underline">Expand</button>
+                            </div>
+                            <div class="maker-note-expanded-1 hidden">
+                                <button class="toggle-maker-note-1 text-indigo-500 hover:underline mb-2">Collapse</button>
+                                <pre class="whitespace-pre-wrap ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</pre>
+                            </div>
+                        </div>
+                        <div class="w-1/3 text-sm break-words text-center">
+                            <div class="maker-note-collapsed-2">
+                                <span class="text-gray-600 dark:text-gray-300">[MakerNote]</span>
+                                <button class="toggle-maker-note-2 text-indigo-500 hover:underline">Expand</button>
+                            </div>
+                            <div class="maker-note-expanded-2 hidden">
+                                <button class="toggle-maker-note-2 text-indigo-500 hover:underline mb-2">Collapse</button>
+                                <pre class="whitespace-pre-wrap ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</pre>
+                            </div>
+                        </div>
+                    ` : `
+                        <span class="w-1/3 text-sm break-words text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</span>
+                        <span class="w-1/3 text-sm break-words text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</span>
+                    `}
+                </div>
+            `;
+            
+            const explainBtn = rowDiv.querySelector('.explain-btn');
+            explainBtn.addEventListener('click', async () => {
+                let explanationDiv = rowDiv.querySelector('.explanation-container');
+                if (explanationDiv) {
+                    explanationDiv.classList.toggle('expanded');
+                } else {
+                    explanationDiv = document.createElement('div');
+                    explanationDiv.className = 'explanation-container p-4 mt-2 bg-indigo-50 dark:bg-indigo-900 rounded-lg text-sm text-gray-700 dark:text-gray-300';
+                    rowDiv.appendChild(explanationDiv);
+                    explanationDiv.classList.add('expanded');
+                    await getComparisonExplanation(key, value1, value2, explanationDiv);
                 }
-            }
-            doc.text("File Info:", margin, y);
-            y += 7;
-            doc.setFontSize(10);
-            state.fileInfo.split('\n').forEach(line => {
-                doc.text(line, margin + 2, y);
-                y += 5;
             });
-            doc.setFontSize(12);
-            y += 5;
-            doc.text("MD5 Hash:", margin, y);
-            y += 7;
-            doc.text(state.md5, margin + 2, y);
-            y += 10;
-            const maxLineWidth = pageWidth - margin * 2;
-            doc.text("EXIF Data:", margin, y);
-            y += 7;
-            const exifStr = JSON.stringify(state.exif, null, 2);
-            let inMakerNote = false;
-            let makerNoteBuffer = '';
-            exifStr.split('\n').forEach(line => {
-                if (!inMakerNote && line.trim().startsWith('"MakerNote":')) {
-                    inMakerNote = true;
-                    makerNoteBuffer = line.trim();
-                    return;
-                }
-                if (inMakerNote) {
-                    makerNoteBuffer += ' ' + line.trim();
-                    if (line.trim().endsWith('"') || line.trim().endsWith('",')) {
-                        const wrappedLines = doc.splitTextToSize(makerNoteBuffer, maxLineWidth);
-                        wrappedLines.forEach(wrappedLine => {
-                            if (y > pageHeight - 20) {
-                                doc.addPage();
-                                y = 20;
-                                doc.setFontSize(10);
-                                doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
-                                doc.setFontSize(12);
-                                doc.text("EXIF Data (cont'd):", margin, y);
-                                y += 7;
-                            }
-                            doc.text(wrappedLine, margin + 2, y);
-                            y += 6;
-                        });
-                        inMakerNote = false;
-                        makerNoteBuffer = '';
-                    }
-                    return;
-                }
-                const wrappedLines = doc.splitTextToSize(line, maxLineWidth);
-                wrappedLines.forEach(wrappedLine => {
-                    if (y > pageHeight - 20) {
-                        doc.addPage();
-                        y = 20;
-                        doc.setFontSize(10);
-                        doc.text(`${domain} | ${state.fileName} | Generated: ${dateStr}`, margin, 10);
-                        doc.setFontSize(12);
-                        doc.text("EXIF Data (cont'd):", margin, y);
-                        y += 7;
-                    }
-                    doc.text(wrappedLine, margin + 2, y);
-                    y += 6;
+
+            // Add event listeners for the new buttons in comparison view
+            if (isMakerNote) {
+                rowDiv.querySelectorAll('.toggle-maker-note-1').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        rowDiv.querySelector('.maker-note-collapsed-1').classList.toggle('hidden');
+                        rowDiv.querySelector('.maker-note-expanded-1').classList.toggle('hidden');
+                    });
                 });
-            });
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(10);
-                doc.text(
-                    `Page ${i} of ${pageCount}`,
-                    pageWidth - margin,
-                    pageHeight - 7,
-                    { align: 'right' }
-                );
+                rowDiv.querySelectorAll('.toggle-maker-note-2').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        rowDiv.querySelector('.maker-note-collapsed-2').classList.toggle('hidden');
+                        rowDiv.querySelector('.maker-note-expanded-2').classList.toggle('hidden');
+                    });
+                });
             }
-            return doc.output('blob');
+
+            exifViewerContainer.appendChild(rowDiv);
+        });
+    };
+
+    // Renders the EXIF data for a single file.
+    const renderSingleFileView = (fileIndex, searchQuery) => {
+        exifViewerContainer.innerHTML = '';
+        viewerTitle.innerText = `EXIF Data for File ${fileIndex}`;
+        searchInput.placeholder = 'Search EXIF data...';
+        const exifData = state[`file${fileIndex}`].exif;
+        
+        renderMetadata(state[`file${fileIndex}`].metadata);
+
+        if (!exifData || Object.keys(exifData).length === 0) {
+            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF data found for this file.</p>';
+            return;
         }
 
-        document.getElementById('downloadPdf').addEventListener('click', async function() {
-            const blob = await generatePdfBlob();
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `${state.fileName}_info.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        const filteredExifData = Object.entries(exifData).filter(([key, value]) => {
+            const normalizedSearch = normalizeString(searchQuery);
+            if (!normalizedSearch) return true;
+            return normalizeString(key).includes(normalizedSearch) || normalizeString(value).includes(normalizedSearch);
         });
-
-        // --- CSV Export from user's code ---
-        function getCsvContent() {
-            let csv = `"Field","Value"\n`;
-            csv += `"Name","${state.file ? state.file.name : state.fileName}"\n`;
-            csv += `"Size","${state.file ? state.file.size + ' bytes' : 'N/A'}"\n`;
-            csv += `"Type","${state.file ? state.file.type : 'N/A'}"\n`;
-            csv += `"MD5","${state.md5}"\n`;
-            Object.entries(state.exif).forEach(([key, value]) => {
-                csv += `"${key}","${typeof value === 'object' ? JSON.stringify(value) : value}"\n`;
-            });
-            return csv;
+        
+        if (filteredExifData.length === 0) {
+            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
+            return;
         }
-        document.getElementById('downloadCsv').addEventListener('click', function() {
-            const blob = new Blob([getCsvContent()], { type: "text/csv" });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `${state.fileName}_info.csv`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        });
 
-        // --- TXT Export from user's code ---
-        function getTxtContent() {
-            return `${state.fileInfo}\n\nMD5 Hash: ${state.md5}\n\nEXIF Data:\n${JSON.stringify(state.exif, null, 2)}`;
+        filteredExifData.forEach(([key, value]) => {
+            const tagElement = renderExifTag(key, value);
+            exifViewerContainer.appendChild(tagElement);
+        });
+    };
+
+    // Renders loaded JSON data.
+    const renderJsonView = (searchQuery) => {
+        exifViewerContainer.innerHTML = '';
+        metadataViewerContainer.innerHTML = ''; // Clear metadata view
+        viewerTitle.innerText = 'Loaded JSON Data';
+        searchInput.placeholder = 'Search JSON data...';
+        
+        if (!state.jsonData) {
+            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No JSON data loaded.</p>';
+            return;
         }
-        document.getElementById('downloadTxt').addEventListener('click', function() {
-            const blob = new Blob([getTxtContent()], { type: "text/plain" });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `${state.fileName}_info.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        });
 
-        // --- JSON Export from user's code ---
-        function getJsonContent() {
-            return JSON.stringify({
-                fileInfo: state.fileInfo,
-                md5: state.md5,
-                exif: state.exif
-            }, null, 2);
+        const jsonDataString = JSON.stringify(state.jsonData, null, 2);
+        const filteredJsonData = jsonDataString.split('\n').filter(line => normalizeString(line).includes(normalizeString(searchQuery))).join('\n');
+
+        const pre = document.createElement('pre');
+        pre.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg whitespace-pre-wrap';
+        pre.textContent = filteredJsonData;
+        exifViewerContainer.appendChild(pre);
+    };
+
+    // Main render function, called on state change.
+    const render = () => {
+        resultsContainer.classList.remove('hidden');
+        const searchQuery = searchInput.value;
+        if (state.currentMode === 'single1') {
+            renderSingleFileView(1, searchQuery);
+        } else if (state.currentMode === 'single2') {
+            renderSingleFileView(2, searchQuery);
+        } else if (state.currentMode === 'compare') {
+            renderComparisonView(searchQuery);
+        } else if (state.currentMode === 'json') {
+            renderJsonView(searchQuery);
+        } else {
+            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Select an option to view data.</p>';
         }
-        document.getElementById('downloadJson').addEventListener('click', function() {
-            const blob = new Blob([getJsonContent()], { type: "application/json" });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = `${state.fileName}_info.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        });
+    };
+    
+    // Download logic
+    const createReportContent = (format) => {
+        if (!['single1', 'single2', 'compare'].includes(state.currentMode)) {
+            return '';
+        }
+        
+        const formatValue = (value) => {
+            if (typeof value === 'object' && value !== null) {
+                return JSON.stringify(value, null, 2);
+            }
+            return String(value);
+        };
+        
+        let content = '';
 
-        // --- ZIP Export from user's code ---
-        document.getElementById('downloadZip').addEventListener('click', async function() {
+        const getFilteredExif = (exifData) => {
+            const filtered = {};
+            // Make sure exifData is not null or undefined
+            if (!exifData) return filtered;
+            for (const key in exifData) {
+                // Filter out MakerNote and other potentially large or complex tags
+                if (key !== 'MakerNote') {
+                    filtered[key] = exifData[key];
+                }
+            }
+            return filtered;
+        };
+
+        if (state.currentMode === 'single1') {
+            if (!state.file1.exif) return '';
+            const fileData = state.file1;
+            const filteredExif = getFilteredExif(fileData.exif);
+            
+            if (format === 'txt') {
+                content += `--- EXIF Report for ${fileData.metadata.name} ---\n\n`;
+                for (const [key, value] of Object.entries(filteredExif)) {
+                    content += `${key}: ${formatValue(value)}\n`;
+                }
+            } else if (format === 'csv') {
+                content += 'Tag,Value\n';
+                for (const [key, value] of Object.entries(filteredExif)) {
+                    content += `"${key}","${formatValue(value).replace(/"/g, '""')}"\n`;
+                }
+            }
+
+        } else if (state.currentMode === 'single2') {
+            if (!state.file2.exif) return '';
+            const fileData = state.file2;
+            const filteredExif = getFilteredExif(fileData.exif);
+            
+            if (format === 'txt') {
+                content += `--- EXIF Report for ${fileData.metadata.name} ---\n\n`;
+                for (const [key, value] of Object.entries(filteredExif)) {
+                    content += `${key}: ${formatValue(value)}\n`;
+                }
+            } else if (format === 'csv') {
+                content += 'Tag,Value\n';
+                for (const [key, value] of Object.entries(filteredExif)) {
+                    content += `"${key}","${formatValue(value).replace(/"/g, '""')}"\n`;
+                }
+            }
+        } else if (state.currentMode === 'compare') {
+            if (!state.file1.exif || !state.file2.exif) return '';
+            const exif1 = getFilteredExif(state.file1.exif);
+            const exif2 = getFilteredExif(state.file2.exif);
+            const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
+            
+            if (format === 'txt') {
+                content += '--- EXIF Comparison Report ---\n\n';
+                for (const key of [...allKeys].sort()) {
+                    const value1 = exif1[key] !== undefined ? formatValue(exif1[key]) : 'N/A';
+                    const value2 = exif2[key] !== undefined ? formatValue(exif2[key]) : 'N/A';
+                    content += `${key}:\n  File 1: ${value1}\n  File 2: ${value2}\n\n`;
+                }
+            } else if (format === 'csv') {
+                content += 'Tag,File 1,File 2\n';
+                for (const key of [...allKeys].sort()) {
+                    const value1 = exif1[key] !== undefined ? formatValue(exif1[key]) : 'N/A';
+                    const value2 = exif2[key] !== undefined ? formatValue(exif2[key]) : 'N/A';
+                    content += `"${key}","${value1.replace(/"/g, '""')}","${value2.replace(/"/g, '""')}"\n`;
+                }
+            }
+        }
+        
+        return content;
+    };
+    
+    const downloadPdfReport = () => {
+        // --- FIX START ---
+        // Added checks to ensure the file and its exif data exist before proceeding.
+        if (state.currentMode === 'single1') {
+            if (!state.file1.file || !state.file1.exif) {
+                showMessage("No EXIF data loaded for File 1 to generate a report.");
+                return;
+            }
+        } else if (state.currentMode === 'single2') {
+            if (!state.file2.file || !state.file2.exif) {
+                showMessage("No EXIF data loaded for File 2 to generate a report.");
+                return;
+            }
+        } else if (state.currentMode === 'compare') {
+            if (!state.file1.file || !state.file1.exif || !state.file2.file || !state.file2.exif) {
+                showMessage("EXIF data for both files is required for a comparison report.");
+                return;
+            }
+        } else {
+            showMessage("Please select a file or comparison view before generating a PDF.");
+            return;
+        }
+        // --- FIX END ---
+
+        showMessage('Generating PDF...');
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 20;
+        const margin = 10;
+        const lineHeight = 7;
+        const maxLineWidth = doc.internal.pageSize.width - margin * 2;
+        
+        const checkPage = () => {
+            if (y > doc.internal.pageSize.height - margin - lineHeight) {
+                doc.addPage();
+                y = margin;
+            }
+        };
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(16);
+        doc.text(`EXIF Report: ${state.currentMode.toUpperCase()}`, margin, y);
+        y += lineHeight * 2;
+        
+        const getFilteredExif = (exifData) => {
+            const filtered = {};
+            if (!exifData) return filtered;
+            for (const key in exifData) {
+                if (key !== 'MakerNote') {
+                    filtered[key] = exifData[key];
+                }
+            }
+            return filtered;
+        };
+
+        if (state.currentMode === 'single1' || state.currentMode === 'single2') {
+            const fileData = state[state.currentMode === 'single1' ? 'file1' : 'file2'];
+            const filteredExif = getFilteredExif(fileData.exif);
+            
+            doc.setFontSize(12); doc.text(`File: ${fileData.metadata.name}`, margin, y); y += lineHeight;
+            doc.text(`Size: ${formatBytes(fileData.metadata.size)}`, margin, y); y += lineHeight;
+            doc.text(`Type: ${fileData.metadata.type}`, margin, y); y += lineHeight * 2;
+
+            for (const [key, value] of Object.entries(filteredExif)) {
+                checkPage();
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${key}: `, margin, y);
+                doc.setFont('helvetica', 'normal');
+                const valueText = (typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value));
+                const lines = doc.splitTextToSize(valueText, maxLineWidth - doc.getTextWidth(`${key}: `));
+                
+                doc.text(lines[0], margin + doc.getTextWidth(`${key}: `), y);
+                for (let i = 1; i < lines.length; i++) {
+                    y += lineHeight;
+                    doc.text(lines[i], margin + doc.getTextWidth(`${key}: `), y);
+                }
+                y += lineHeight;
+            }
+
+        } else if (state.currentMode === 'compare') {
+            const exif1 = getFilteredExif(state.file1.exif);
+            const exif2 = getFilteredExif(state.file2.exif);
+            const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
+            
+            for (const key of [...allKeys].sort()) {
+                const value1 = exif1[key] !== undefined ? exif1[key] : 'N/A';
+                const value2 = exif2[key] !== undefined ? exif2[key] : 'N/A';
+                const value1Text = (typeof value1 === 'object' ? JSON.stringify(value1, null, 2) : String(value1));
+                const value2Text = (typeof value2 === 'object' ? JSON.stringify(value2, null, 2) : String(value2));
+
+                checkPage();
+                doc.setFont('helvetica', 'bold');
+                doc.text(`${key}:`, margin, y);
+                
+                doc.setFont('helvetica', 'normal');
+                y += lineHeight;
+                checkPage();
+                doc.text(`File 1: ${value1Text}`, margin + 5, y);
+                y += lineHeight;
+                checkPage();
+                doc.text(`File 2: ${value2Text}`, margin + 5, y);
+                y += lineHeight;
+            }
+        }
+        
+        const filename = `exif-report-${state.currentMode}-${new Date().toISOString().slice(0, 10)}.pdf`;
+        doc.save(filename);
+        showMessage('PDF report downloaded successfully.');
+    };
+
+    const downloadReport = async (format) => {
+        if (!['single1', 'single2', 'compare'].includes(state.currentMode)) {
+            showMessage("No data to download. Please display a file or comparison first.");
+            return;
+        }
+
+        const fileName = `exif-report-${state.currentMode}-${new Date().toISOString().slice(0, 10)}`;
+
+        if (format === 'txt') {
+            const content = createReportContent('txt');
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            saveAs(blob, `${fileName}.txt`);
+        } else if (format === 'csv') {
+            const content = createReportContent('csv');
+            const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
+            saveAs(blob, `${fileName}.csv`);
+        } else if (format === 'zip') {
             const zip = new JSZip();
-            zip.file(`${state.fileName}_info.csv`, getCsvContent());
-            zip.file(`${state.fileName}_info.txt`, getTxtContent());
-            zip.file(`${state.fileName}_info.json`, getJsonContent());
-            const pdfBlob = await generatePdfBlob();
-            zip.file(`${state.fileName}_info.pdf`, pdfBlob);
-            zip.generateAsync({ type: "blob" }).then(function(content) {
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(content);
-                a.download = `${state.fileName}_info.zip`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            });
-        });
+            const txtContent = createReportContent('txt');
+            if (txtContent) {
+                zip.file(`${fileName}.txt`, txtContent);
+            }
+            const csvContent = createReportContent('csv');
+            if (csvContent) {
+                zip.file(`${fileName}.csv`, csvContent);
+            }
+            if (Object.keys(zip.files).length > 0) {
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, `${fileName}.zip`);
+            } else {
+                showMessage("No data to include in the ZIP file.");
+            }
+        }
+    };
+    
+    // Function to handle loading JSON from a URL with validation
+    const processJsonUrl = async (url) => {
+        if (!url || !URL.canParse(url)) {
+            showMessage("Please enter a valid JSON API URL (e.g., https://api.example.com/data).");
+            return;
+        }
+        
+        try {
+            const response = await fetchWithTimeout(url);
+            state.jsonData = await response.json();
+            showMessage("JSON data loaded successfully. Click 'Display Loaded JSON' to view it.");
+        } catch (error) {
+            console.error("Error loading JSON from URL:", error);
+            let errorMessage = `Error loading JSON data. This is often due to a Cross-Origin Resource Sharing (CORS) policy on the server, which prevents your browser from accessing the data.`;
+            if (error.name === 'AbortError' || error.message.includes('timed out')) {
+                errorMessage = `API request timed out. The server might be slow or unresponsive.`;
+            } else if (error.message.includes('Failed to fetch')) {
+                errorMessage = `Failed to fetch data. This is likely due to a CORS policy preventing access.`;
+            }
+            showMessage(errorMessage);
+        }
+    };
 
-        // Add a global error handler to make sure the app doesn't break
-        window.addEventListener('unhandledrejection', event => {
-            console.error('An unhandled promise rejection occurred:', event.reason);
-        });
-    </script>
+
+    // --- Event Listeners ---
+    file1Input.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        // Show loading message
+        showMessage("Loading File 1 metadata...");
+        
+        // Use Promise.all to fetch both EXIF and other metadata in parallel
+        const [metadata, exifData] = await Promise.all([
+            getFileMetadata(file),
+            new Promise(resolve => {
+                EXIF.getData(file, function() {
+                    resolve(EXIF.getAllTags(this) || {});
+                });
+            })
+        ]);
+        
+        state.file1.file = file;
+        state.file1.metadata = metadata;
+        state.file1.exif = exifData;
+
+        showMessage("File 1 metadata and EXIF data loaded.");
+    });
+
+    file2Input.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        showMessage("Loading File 2 metadata...");
+        
+        const [metadata, exifData] = await Promise.all([
+            getFileMetadata(file),
+            new Promise(resolve => {
+                EXIF.getData(file, function() {
+                    resolve(EXIF.getAllTags(this) || {});
+                });
+            })
+        ]);
+        
+        state.file2.file = file;
+        state.file2.metadata = metadata;
+        state.file2.exif = exifData;
+        
+        showMessage("File 2 metadata and EXIF data loaded.");
+    });
+    
+    displayFile1Btn.addEventListener('click', () => {
+        if (!state.file1.file) {
+            showMessage("Please upload a file for File 1 first.");
+            return;
+        }
+        state.currentMode = 'single1';
+        render();
+    });
+    
+    displayFile2Btn.addEventListener('click', () => {
+        if (!state.file2.file) {
+            showMessage("Please upload a file for File 2 first.");
+            return;
+        }
+        state.currentMode = 'single2';
+        render();
+    });
+    
+    loadJsonBtn.addEventListener('click', () => processJsonUrl(jsonUrlInput.value));
+    
+    displayJsonBtn.addEventListener('click', () => {
+        if (!state.jsonData) {
+            showMessage("No JSON data loaded. Please load data from an API first.");
+            return;
+        }
+        state.currentMode = 'json';
+        render();
+    });
+
+    compareFilesBtn.addEventListener('click', () => {
+        if (!state.file1.file || !state.file2.file) {
+            showMessage("Please load data for both File 1 and File 2 to compare them.");
+            return;
+        }
+        state.currentMode = 'compare';
+        render();
+    });
+
+    // Download buttons
+    downloadTxtBtn.addEventListener('click', () => downloadReport('txt'));
+    downloadCsvBtn.addEventListener('click', () => downloadReport('csv'));
+    downloadPdfBtn.addEventListener('click', downloadPdfReport);
+    downloadZipBtn.addEventListener('click', () => downloadReport('zip'));
+
+    // Search input listener
+    searchInput.addEventListener('input', () => {
+        render(); // Rerender on every search input change
+    });
+    
+    render(); // Initial render
+});
+</script>
+
 </body>
 </html>
