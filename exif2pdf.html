@@ -145,8 +145,8 @@
     document.addEventListener('DOMContentLoaded', () => {
         // --- State Variables ---
         const state = {
-            file1: { file: null, metadata: {}, exif: {}, jsonData: null, sourceType: 'local' },
-            file2: { file: null, metadata: {}, exif: {}, jsonData: null, sourceType: 'local' },
+            file1: { file: null, metadata: {}, exif: {}, jsonData: null, sourceType: 'local', thumbnail: null },
+            file2: { file: null, metadata: {}, exif: {}, jsonData: null, sourceType: 'local', thumbnail: null },
             currentMode: 'none', // 'single1', 'single2', 'compare', 'json1', 'json2'
         };
 
@@ -377,6 +377,33 @@
             
             return tagDiv;
         };
+        
+        // Renders the thumbnail image or a placeholder
+        const renderThumbnail = (fileData, title) => {
+            const thumbnailContainer = document.createElement('div');
+            thumbnailContainer.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg flex flex-col items-center justify-center mb-6';
+            
+            const thumbnailTitle = document.createElement('h3');
+            thumbnailTitle.className = 'text-xl font-medium mb-2 text-gray-700 dark:text-gray-300';
+            thumbnailTitle.textContent = title;
+            thumbnailContainer.appendChild(thumbnailTitle);
+
+            if (fileData && fileData.thumbnail) {
+                const img = document.createElement('img');
+                img.src = fileData.thumbnail;
+                img.alt = `Embedded thumbnail for ${fileData.metadata.name}`;
+                img.className = 'max-w-full h-auto rounded-lg shadow-md';
+                thumbnailContainer.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'flex items-center justify-center w-full h-32 bg-gray-200 dark:bg-gray-600 rounded-lg text-gray-500 dark:text-gray-400';
+                placeholder.textContent = 'No thumbnail available';
+                thumbnailContainer.appendChild(placeholder);
+            }
+            
+            return thumbnailContainer;
+        };
+
 
         // Renders the file metadata section
         const renderMetadata = (metadata, isComparison = false, metadata2 = null) => {
@@ -438,6 +465,14 @@
             searchInput.placeholder = 'Search EXIF data...';
 
             renderMetadata(state.file1.metadata, true, state.file2.metadata);
+            
+            // Add thumbnail comparison section
+            const thumbnailComparisonDiv = document.createElement('div');
+            thumbnailComparisonDiv.className = 'grid grid-cols-1 md:grid-cols-2 gap-4 mb-6';
+            thumbnailComparisonDiv.appendChild(renderThumbnail(state.file1, `File 1 Thumbnail`));
+            thumbnailComparisonDiv.appendChild(renderThumbnail(state.file2, `File 2 Thumbnail`));
+            dataViewerContainer.appendChild(thumbnailComparisonDiv);
+
 
             const combinedExif = {};
             const exif1 = state.file1.exif || {};
@@ -450,14 +485,14 @@
 
             const filteredExifData = Object.entries(combinedExif).filter(([key, values]) => {
                 const normalizedSearch = normalizeString(searchQuery);
-                if (!normalizedSearch) return true;
-                const value1 = values[0] !== undefined ? String(values[0]) : '';
-                const value2 = values[1] !== undefined ? String(values[1]) : '';
-                return normalizeString(key).includes(normalizedSearch) || normalizeString(value1).includes(normalizedSearch) || normalizeString(value2).includes(normalizedSearch);
+                if (!normalizedSearch) return key !== 'thumbnail' && (normalizeString(key).includes(normalizedSearch) || normalizeString(values[0]).includes(normalizedSearch) || normalizeString(values[1]).includes(normalizedSearch));
             });
 
             if (filteredExifData.length === 0) {
-                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
+                const noData = document.createElement('p');
+                noData.className = 'text-gray-500 text-center py-4';
+                noData.textContent = 'No EXIF tags match your search.';
+                dataViewerContainer.appendChild(noData);
                 return;
             }
             
@@ -554,23 +589,34 @@
             dataViewerContainer.innerHTML = '';
             viewerTitle.innerText = `EXIF Data for File ${fileIndex}`;
             searchInput.placeholder = 'Search EXIF data...';
-            const exifData = state[`file${fileIndex}`].exif;
+            const fileData = state[`file${fileIndex}`];
+            const exifData = fileData.exif;
             
-            renderMetadata(state[`file${fileIndex}`].metadata);
+            renderMetadata(fileData.metadata);
+
+            // Add thumbnail
+            dataViewerContainer.appendChild(renderThumbnail(fileData, `Embedded Thumbnail`));
 
             if (!exifData || Object.keys(exifData).length === 0) {
-                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF data found for this file.</p>';
+                const noData = document.createElement('p');
+                noData.className = 'text-gray-500 text-center py-4';
+                noData.textContent = 'No EXIF data found for this file.';
+                dataViewerContainer.appendChild(noData);
                 return;
             }
 
             const filteredExifData = Object.entries(exifData).filter(([key, value]) => {
                 const normalizedSearch = normalizeString(searchQuery);
-                if (!normalizedSearch) return true;
-                return normalizeString(key).includes(normalizedSearch) || normalizeString(value).includes(normalizedSearch);
+                // Exclude the 'thumbnail' tag from the main list as it's displayed separately
+                if (!normalizedSearch) return key !== 'thumbnail';
+                return key !== 'thumbnail' && (normalizeString(key).includes(normalizedSearch) || normalizeString(value).includes(normalizedSearch));
             });
             
             if (filteredExifData.length === 0) {
-                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
+                const noData = document.createElement('p');
+                noData.className = 'text-gray-500 text-center py-4';
+                noData.textContent = 'No EXIF tags match your search.';
+                dataViewerContainer.appendChild(noData);
                 return;
             }
 
@@ -640,7 +686,7 @@
                 const filtered = {};
                 if (!exifData) return filtered;
                 for (const key in exifData) {
-                    if (key !== 'MakerNote') {
+                    if (key !== 'MakerNote' && key.toLowerCase() !== 'thumbnail') {
                         filtered[key] = exifData[key];
                     }
                 }
@@ -736,7 +782,7 @@
                 const filtered = {};
                 if (!exifData) return filtered;
                 for (const key in exifData) {
-                    if (key !== 'MakerNote') {
+                    if (key !== 'MakerNote' && key.toLowerCase() !== 'thumbnail') {
                         filtered[key] = exifData[key];
                     }
                 }
@@ -849,7 +895,9 @@
                     getFileMetadata(file, url),
                     new Promise(resolve => {
                         EXIF.getData(file, function() {
-                            resolve(EXIF.getAllTags(this) || {});
+                            const tags = EXIF.getAllTags(this) || {};
+                            const thumbnail = EXIF.getTag(this, 'Thumbnail') || null;
+                            resolve({ tags, thumbnail });
                         });
                     })
                 ]);
@@ -857,7 +905,8 @@
                 const fileData = state[`file${fileIndex}`];
                 fileData.file = file;
                 fileData.metadata = metadata;
-                fileData.exif = exifData;
+                fileData.exif = exifData.tags;
+                fileData.thumbnail = exifData.thumbnail;
                 fileData.jsonData = null;
                 showMessage(`Image data loaded successfully for File ${fileIndex}.`);
 
@@ -887,6 +936,7 @@
                 fileData.file = null;
                 fileData.metadata = {};
                 fileData.exif = {};
+                fileData.thumbnail = null; // Clear thumbnail for JSON data
 
                 showMessage(`JSON data loaded successfully for File ${fileIndex}.`);
             } catch (error) {
@@ -927,11 +977,16 @@
                 showMessage("Loading File 1 metadata...");
                 const [metadata, exifData] = await Promise.all([
                     getFileMetadata(file),
-                    new Promise(resolve => EXIF.getData(file, function() { resolve(EXIF.getAllTags(this) || {}); }))
+                    new Promise(resolve => EXIF.getData(file, function() {
+                        const tags = EXIF.getAllTags(this) || {};
+                        const thumbnail = EXIF.getTag(this, 'Thumbnail') || null;
+                        resolve({ tags, thumbnail });
+                    }))
                 ]);
                 state.file1.file = file;
                 state.file1.metadata = metadata;
-                state.file1.exif = exifData;
+                state.file1.exif = exifData.tags;
+                state.file1.thumbnail = exifData.thumbnail;
                 state.file1.jsonData = null;
                 showMessage("File 1 metadata and EXIF data loaded.");
             } else if (sourceType === 'image-url') {
@@ -953,11 +1008,16 @@
                 showMessage("Loading File 2 metadata...");
                 const [metadata, exifData] = await Promise.all([
                     getFileMetadata(file),
-                    new Promise(resolve => EXIF.getData(file, function() { resolve(EXIF.getAllTags(this) || {}); }))
+                    new Promise(resolve => EXIF.getData(file, function() {
+                        const tags = EXIF.getAllTags(this) || {};
+                        const thumbnail = EXIF.getTag(this, 'Thumbnail') || null;
+                        resolve({ tags, thumbnail });
+                    }))
                 ]);
                 state.file2.file = file;
                 state.file2.metadata = metadata;
-                state.file2.exif = exifData;
+                state.file2.exif = exifData.tags;
+                state.file2.thumbnail = exifData.thumbnail;
                 state.file2.jsonData = null;
                 showMessage("File 2 metadata and EXIF data loaded.");
             } else if (sourceType === 'image-url') {
