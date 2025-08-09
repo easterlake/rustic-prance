@@ -45,24 +45,58 @@
         <!-- File 1 Section -->
         <div class="p-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex flex-col gap-4">
             <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300">File 1</h2>
-            <input type="file" id="file1-input" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
-            <button id="display-file1-btn" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Display Local File 1</button>
+            
+            <!-- Input Type Selection for File 1 -->
+            <select id="file1-input-type" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                <option value="local">Local File</option>
+                <option value="image-url">Image URL</option>
+                <option value="json-url">JSON API URL</option>
+            </select>
+
+            <!-- File 1 Inputs -->
+            <div id="file1-local-input">
+                <input type="file" id="file1-input" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+            </div>
+            <div id="file1-image-url-input" class="hidden">
+                <input type="url" id="file1-image-url" placeholder="Enter image URL..." value="https://upload.wikimedia.org/wikipedia/commons/e/e8/Colosseum_in_Rome%2C_Italy_-_2018.jpg" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            </div>
+            <div id="file1-json-url-input" class="hidden">
+                <input type="url" id="file1-json-url" placeholder="Enter JSON API URL..." value="https://jsonplaceholder.typicode.com/posts/1" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            </div>
+
+            <!-- File 1 Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button id="load-file1-btn" class="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Load Data</button>
+                <button id="display-file1-btn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Display Data</button>
+            </div>
         </div>
 
         <!-- File 2 Section -->
         <div class="p-6 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex flex-col gap-4">
             <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300">File 2</h2>
-            <input type="file" id="file2-input" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
-            <button id="display-file2-btn" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Display Local File 2</button>
-        </div>
 
-        <!-- JSON API Section -->
-        <div class="p-6 col-span-full bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-xl flex flex-col gap-4">
-            <h2 class="text-xl font-medium text-gray-700 dark:text-gray-300">JSON API</h2>
-            <input type="url" id="json-url-input" placeholder="Enter JSON API URL..." value="https://jsonplaceholder.typicode.com/posts/1" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            <!-- Input Type Selection for File 2 -->
+            <select id="file2-input-type" class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600">
+                <option value="local">Local File</option>
+                <option value="image-url">Image URL</option>
+                <option value="json-url">JSON API URL</option>
+            </select>
+
+            <!-- File 2 Inputs -->
+            <div id="file2-local-input">
+                <input type="file" id="file2-input" accept="image/*" class="block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"/>
+            </div>
+            <div id="file2-image-url-input" class="hidden">
+                <input type="url" id="file2-image-url" placeholder="Enter image URL..." class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            </div>
+            <div id="file2-json-url-input" class="hidden">
+                <input type="url" id="file2-json-url" placeholder="Enter JSON API URL..." class="w-full px-4 py-2 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            </div>
+
+            <!-- File 2 Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-4">
-                <button id="load-json-btn" class="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Load JSON Data</button>
-                <button id="display-json-btn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Display Loaded JSON</button>
+                <button id="load-file2-btn" class="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition-colors">Load Data</button>
+                <button id="display-file2-btn" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">Display Data</button>
             </div>
         </div>
     </div>
@@ -87,7 +121,7 @@
     <div id="results-container" class="mt-8 hidden">
         <!-- Search Bar -->
         <div class="relative mb-6">
-            <input type="text" id="search-input" placeholder="Search EXIF data..." class="w-full px-4 py-2 pr-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
+            <input type="text" id="search-input" placeholder="Search data..." class="w-full px-4 py-2 pr-10 rounded-lg border-2 border-gray-300 focus:outline-none focus:border-indigo-500 transition-colors dark:bg-gray-700 dark:text-white dark:border-gray-600"/>
             <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 112 8z" clip-rule="evenodd"/>
@@ -97,7 +131,7 @@
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
             <h2 id="viewer-title" class="text-2xl font-bold mb-4 text-gray-800 dark:text-white"></h2>
             <div id="metadata-viewer-container" class="mb-6"></div>
-            <div id="exif-viewer-container" class="flex flex-col space-y-4 divide-y divide-gray-200 dark:divide-gray-700">
+            <div id="data-viewer-container" class="flex flex-col space-y-4 divide-y divide-gray-200 dark:divide-gray-700">
                 <!-- Data will be rendered here -->
             </div>
         </div>
@@ -109,830 +143,885 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-    // --- State Variables ---
-    const state = {
-        file1: { file: null, metadata: {}, exif: {} },
-        file2: { file: null, metadata: {}, exif: {} },
-        jsonData: null,
-        currentMode: 'none', // 'single1', 'single2', 'compare', 'json'
-    };
-
-    // --- DOM Elements ---
-    const file1Input = document.getElementById('file1-input');
-    const file2Input = document.getElementById('file2-input');
-    const jsonUrlInput = document.getElementById('json-url-input');
-    const displayFile1Btn = document.getElementById('display-file1-btn');
-    const displayFile2Btn = document.getElementById('display-file2-btn');
-    const loadJsonBtn = document.getElementById('load-json-btn');
-    const displayJsonBtn = document.getElementById('display-json-btn');
-    const compareFilesBtn = document.getElementById('compare-files-btn');
-    const downloadTxtBtn = document.getElementById('download-txt-btn');
-    const downloadCsvBtn = document.getElementById('download-csv-btn');
-    const downloadPdfBtn = document.getElementById('download-pdf-btn');
-    const downloadZipBtn = document.getElementById('download-zip-btn');
-    const resultsContainer = document.getElementById('results-container');
-    const viewerTitle = document.getElementById('viewer-title');
-    const metadataViewerContainer = document.getElementById('metadata-viewer-container');
-    const exifViewerContainer = document.getElementById('exif-viewer-container');
-    const searchInput = document.getElementById('search-input');
-    const toastContainer = document.getElementById('toast-container');
-
-    // --- Utility Functions ---
-
-    // A function to handle API calls with exponential backoff for retries and a timeout.
-    async function fetchWithTimeout(url, options = {}, retries = 5, timeout = 10000) {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeout);
-        
-        try {
-            const response = await fetch(url, { ...options, signal: controller.signal });
-            clearTimeout(timeoutId);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch from ${url} with status ${response.status}`);
-            }
-            return response;
-        } catch (error) {
-            clearTimeout(timeoutId);
-            console.error(`Fetch attempt failed for ${url} (Retries left: ${retries}):`, error);
-            
-            if (error.name === 'AbortError') {
-                throw new Error('API request timed out.');
-            }
-            
-            if (retries > 0) {
-                const delay = Math.pow(2, 5 - retries) * 1000;
-                console.warn(`Retrying in ${delay / 1000}s...`);
-                await new Promise(res => setTimeout(res, delay));
-                return fetchWithTimeout(url, options, retries - 1, timeout);
-            } else {
-                throw error;
-            }
-        }
-    }
-
-    // Displays a temporary, dismissible toast notification.
-    const showMessage = (text) => {
-        toastContainer.innerHTML = `
-            <div class="flex items-center justify-between p-4 bg-gray-900 text-white rounded-lg shadow-xl animate-fade-in-up">
-                <p class="mr-4">${text}</p>
-                <button class="text-white hover:text-gray-300" onclick="this.parentElement.parentElement.classList.add('hidden')">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-        `;
-        toastContainer.classList.remove('hidden');
-        setTimeout(() => {
-            toastContainer.classList.add('hidden');
-        }, 5000);
-    };
-    
-    // Calculates SHA-256 hash of a file using the Web Crypto API
-    const getSha256Hash = async (file) => {
-        try {
-            const buffer = await file.arrayBuffer();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const sha256Hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            return sha256Hash;
-        } catch (e) {
-            console.error("SHA-256 hash calculation failed:", e);
-            return 'Failed to calculate hash';
-        }
-    };
-    
-    // Gets basic file metadata
-    const getFileMetadata = async (file) => {
-        if (!file) return {};
-        return {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            sha256: await getSha256Hash(file),
+        // --- State Variables ---
+        const state = {
+            file1: { file: null, metadata: {}, exif: {}, jsonData: null, sourceType: 'local' },
+            file2: { file: null, metadata: {}, exif: {}, jsonData: null, sourceType: 'local' },
+            currentMode: 'none', // 'single1', 'single2', 'compare', 'json1', 'json2'
         };
-    };
 
-    // Calls the Gemini API to get an explanation for an EXIF tag.
-    const getExplanation = async (tagName, tagValue, explanationDiv) => {
-        // Show a loading state
-        explanationDiv.innerHTML = `<p class="italic">Generating explanation...</p>`;
+        // --- DOM Elements ---
+        const file1InputType = document.getElementById('file1-input-type');
+        const file2InputType = document.getElementById('file2-input-type');
         
-        const prompt = `Explain the EXIF tag named "${tagName}" with the value "${tagValue}". Provide a concise, easy-to-understand explanation for a photography enthusiast. Use markdown for formatting, including bold, italics, or bullet points where appropriate. Ensure there is a blank line between each paragraph to improve readability.`;
-        try {
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiKey = ""; // API key will be provided at runtime
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const response = await fetchWithTimeout(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
-            if (result.candidates && result.candidates.length > 0) {
-                // Use marked.js to convert the markdown content
-                const formattedHtml = marked.parse(result.candidates[0].content.parts[0].text);
-                explanationDiv.innerHTML = formattedHtml;
-            } else {
-                explanationDiv.innerHTML = `<p class="text-red-500">Sorry, I couldn't generate an explanation.</p>`;
+        const file1LocalInputDiv = document.getElementById('file1-local-input');
+        const file1ImageUrlDiv = document.getElementById('file1-image-url-input');
+        const file1JsonUrlDiv = document.getElementById('file1-json-url-input');
+        
+        const file2LocalInputDiv = document.getElementById('file2-local-input');
+        const file2ImageUrlDiv = document.getElementById('file2-image-url-input');
+        const file2JsonUrlDiv = document.getElementById('file2-json-url-input');
+
+        const file1Input = document.getElementById('file1-input');
+        const file1ImageUrl = document.getElementById('file1-image-url');
+        const file1JsonUrl = document.getElementById('file1-json-url');
+
+        const file2Input = document.getElementById('file2-input');
+        const file2ImageUrl = document.getElementById('file2-image-url');
+        const file2JsonUrl = document.getElementById('file2-json-url');
+        
+        const loadFile1Btn = document.getElementById('load-file1-btn');
+        const loadFile2Btn = document.getElementById('load-file2-btn');
+        const displayFile1Btn = document.getElementById('display-file1-btn');
+        const displayFile2Btn = document.getElementById('display-file2-btn');
+        const compareFilesBtn = document.getElementById('compare-files-btn');
+        const downloadTxtBtn = document.getElementById('download-txt-btn');
+        const downloadCsvBtn = document.getElementById('download-csv-btn');
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        const downloadZipBtn = document.getElementById('download-zip-btn');
+        const resultsContainer = document.getElementById('results-container');
+        const viewerTitle = document.getElementById('viewer-title');
+        const metadataViewerContainer = document.getElementById('metadata-viewer-container');
+        const dataViewerContainer = document.getElementById('data-viewer-container');
+        const searchInput = document.getElementById('search-input');
+        const toastContainer = document.getElementById('toast-container');
+
+        // --- Utility Functions ---
+
+        // A function to handle API calls with exponential backoff for retries and a timeout.
+        async function fetchWithTimeout(url, options = {}, retries = 5, timeout = 10000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+            
+            try {
+                const response = await fetch(url, { ...options, signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch from ${url} with status ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                console.error(`Fetch attempt failed for ${url} (Retries left: ${retries}):`, error);
+                
+                if (error.name === 'AbortError') {
+                    throw new Error('API request timed out.');
+                }
+                
+                if (retries > 0) {
+                    const delay = Math.pow(2, 5 - retries) * 1000;
+                    console.warn(`Retrying in ${delay / 1000}s...`);
+                    await new Promise(res => setTimeout(res, delay));
+                    return fetchWithTimeout(url, options, retries - 1, timeout);
+                } else {
+                    throw error;
+                }
             }
-        } catch (error) {
-            console.error("Error calling Gemini API:", error);
-            explanationDiv.innerHTML = `<p class="text-red-500">An error occurred while generating the explanation.</p>`;
         }
-    };
-    
-    // Calls the Gemini API for a comparison explanation.
-    const getComparisonExplanation = async (tagName, value1, value2, explanationDiv) => {
-        // Show a loading state
-        explanationDiv.innerHTML = `<p class="italic">Generating explanation...</p>`;
-        
-        const prompt = `Explain the EXIF tag named "${tagName}" in the context of image metadata comparison, with values "${value1}" and "${value2}". Highlight the differences if any. Provide a concise, easy-to-understand explanation. Use markdown for formatting, including bold, italics, or bullet points where appropriate. Ensure there is a blank line between each paragraph to improve readability.`;
-        try {
-            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-            const response = await fetchWithTimeout(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const result = await response.json();
-            if (result.candidates && result.candidates.length > 0) {
-                // Use marked.js to convert the markdown content
-                const formattedHtml = marked.parse(result.candidates[0].content.parts[0].text);
-                explanationDiv.innerHTML = formattedHtml;
-            } else {
-                explanationDiv.innerHTML = `<p class="text-red-500">Sorry, I couldn't generate an explanation.</p>`;
-            }
-        } catch (error) {
-            console.error("Error calling Gemini API:", error);
-            explanationDiv.innerHTML = `<p class="text-red-500">An error occurred while generating the explanation.</p>`;
-        }
-    };
 
-
-    // Normalizes a string for case-insensitive, space-agnostic searching.
-    const normalizeString = (str) => String(str).toLowerCase().replace(/\s/g, '');
-
-    // Renders a single EXIF tag entry.
-    const renderExifTag = (tagName, tagValue) => {
-        const tagDiv = document.createElement('div');
-        tagDiv.className = 'flex flex-col py-2 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200';
-        
-        const isMakerNote = tagName === "MakerNote";
-        const displayValue = (typeof tagValue === 'object' && tagValue !== null) ? JSON.stringify(tagValue, null, 2) : String(tagValue);
-        
-        tagDiv.innerHTML = `
-            <div class="flex items-start justify-between">
-                <div class="flex items-center space-x-2 w-1/3">
-                    <span class="font-semibold text-gray-800 dark:text-gray-100">${tagName}</span>
-                    <button class="explain-btn flex items-center text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200 rounded-full px-2 py-1 bg-indigo-100 dark:bg-indigo-900">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        Explain
+        // Displays a temporary, dismissible toast notification.
+        const showMessage = (text) => {
+            toastContainer.innerHTML = `
+                <div class="flex items-center justify-between p-4 bg-gray-900 text-white rounded-lg shadow-xl animate-fade-in-up">
+                    <p class="mr-4">${text}</p>
+                    <button class="text-white hover:text-gray-300" onclick="this.parentElement.parentElement.classList.add('hidden')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-                <div class="w-2/3 break-words text-sm text-gray-600 dark:text-gray-300">
-                    ${isMakerNote ? `
-                        <div class="maker-note-collapsed">
-                            <pre>[MakerNote data is large and complex.]</pre>
-                            <button class="toggle-maker-note text-indigo-500 hover:underline mt-1">Expand</button>
-                        </div>
-                        <div class="maker-note-expanded hidden">
-                            <button class="toggle-maker-note text-indigo-500 hover:underline mb-2">Collapse</button>
-                            <pre>${displayValue}</pre>
-                        </div>
-                    ` : `
-                        <pre class="whitespace-pre-wrap">${displayValue}</pre>
-                    `}
-                </div>
-            </div>
-            <div class="explanation-container"></div>
-        `;
-
-        const explainBtn = tagDiv.querySelector('.explain-btn');
-        explainBtn.addEventListener('click', async () => {
-            let explanationDiv = tagDiv.querySelector('.explanation-container');
-            
-            // Check if the explanation div is already there and toggle
-            if (explanationDiv.textContent.trim() !== '') {
-                explanationDiv.classList.toggle('expanded');
-                return;
-            }
-
-            // If it doesn't exist, make the API call
-            explanationDiv.classList.add('expanded');
-            await getExplanation(tagName, tagValue, explanationDiv);
-        });
+            `;
+            toastContainer.classList.remove('hidden');
+            setTimeout(() => {
+                toastContainer.classList.add('hidden');
+            }, 5000);
+        };
         
-        const toggleButtons = tagDiv.querySelectorAll('.toggle-maker-note');
-        if (toggleButtons.length > 0) {
-            const collapsedDiv = tagDiv.querySelector('.maker-note-collapsed');
-            const expandedDiv = tagDiv.querySelector('.maker-note-expanded');
-            toggleButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    collapsedDiv.classList.toggle('hidden');
-                    expandedDiv.classList.toggle('hidden');
+        // Calculates SHA-256 hash of a file using the Web Crypto API
+        const getSha256Hash = async (file) => {
+            try {
+                const buffer = await file.arrayBuffer();
+                const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const sha256Hash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                return sha256Hash;
+            } catch (e) {
+                console.error("SHA-256 hash calculation failed:", e);
+                return 'Failed to calculate hash';
+            }
+        };
+        
+        // Gets basic file metadata
+        const getFileMetadata = async (file, sourceName) => {
+            if (!file) return {};
+            return {
+                name: sourceName || file.name,
+                size: file.size,
+                type: file.type,
+                sha256: await getSha256Hash(file),
+            };
+        };
+
+        // Calls the Gemini API to get an explanation for an EXIF tag.
+        const getExplanation = async (tagName, tagValue, explanationDiv) => {
+            explanationDiv.innerHTML = `<p class="italic">Generating explanation...</p>`;
+            
+            const prompt = `Explain the EXIF tag named "${tagName}" with the value "${tagValue}". Provide a concise, easy-to-understand explanation for a photography enthusiast. Use markdown for formatting, including bold, italics, or bullet points where appropriate. Ensure there is a blank line between each paragraph to improve readability.`;
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const response = await fetchWithTimeout(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
                 });
-            });
-        }
-        
-        return tagDiv;
-    };
-    
-    // Renders the file metadata section
-    const renderMetadata = (metadata, isComparison = false, metadata2 = null) => {
-        metadataViewerContainer.innerHTML = '';
-        const metadataDiv = document.createElement('div');
-        metadataDiv.className = 'flex flex-col space-y-4 mb-6';
-        
-        const metadataKeys = ['name', 'size', 'type', 'sha256'];
-        
-        metadataKeys.forEach(key => {
-            const metadataRow = document.createElement('div');
-            metadataRow.className = 'flex items-center py-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700';
-            
-            let value1 = metadata[key] || 'N/A';
-            let value2 = metadata2 ? (metadata2[key] || 'N/A') : null;
-            
-            // Format size for readability
-            if (key === 'size') {
-                value1 = formatBytes(value1);
-                if (value2) value2 = formatBytes(value2);
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0) {
+                    const formattedHtml = marked.parse(result.candidates[0].content.parts[0].text);
+                    explanationDiv.innerHTML = formattedHtml;
+                } else {
+                    explanationDiv.innerHTML = `<p class="text-red-500">Sorry, I couldn't generate an explanation.</p>`;
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                explanationDiv.innerHTML = `<p class="text-red-500">An error occurred while generating the explanation.</p>`;
             }
-
-            if (isComparison) {
-                const isDifferent = value1 !== value2;
-                metadataRow.innerHTML = `
-                    <div class="flex items-start justify-between w-full">
-                        <span class="font-bold w-1/3">${key.charAt(0).toUpperCase() + key.slice(1)}:</span>
-                        <span class="w-1/3 text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</span>
-                        <span class="w-1/3 text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</span>
-                    </div>
-                `;
-            } else {
-                 metadataRow.innerHTML = `
-                    <span class="font-bold w-1/3">${key.charAt(0).toUpperCase() + key.slice(1)}:</span>
-                    <span class="w-2/3 text-gray-600 dark:text-gray-300">${value1}</span>
-                `;
-            }
-            metadataDiv.appendChild(metadataRow);
-        });
-        metadataViewerContainer.appendChild(metadataDiv);
-    };
-
-    // Helper function to format bytes for display
-    const formatBytes = (bytes, decimals = 2) => {
-        if (bytes === 0) return '0 Bytes';
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    };
-    
-    // Renders the EXIF comparison view.
-    const renderComparisonView = (searchQuery) => {
-        exifViewerContainer.innerHTML = '';
-        viewerTitle.innerText = 'EXIF Data Comparison';
-        searchInput.placeholder = 'Search EXIF data...';
-
-        renderMetadata(state.file1.metadata, true, state.file2.metadata);
-
-        const combinedExif = {};
-        const exif1 = state.file1.exif || {};
-        const exif2 = state.file2.exif || {};
-        const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
-
-        [...allKeys].sort().forEach(key => {
-            combinedExif[key] = [exif1[key], exif2[key]];
-        });
-
-        const filteredExifData = Object.entries(combinedExif).filter(([key, values]) => {
-            const normalizedSearch = normalizeString(searchQuery);
-            if (!normalizedSearch) return true;
-            const value1 = values[0] !== undefined ? String(values[0]) : '';
-            const value2 = values[1] !== undefined ? String(values[1]) : '';
-            return normalizeString(key).includes(normalizedSearch) || normalizeString(value1).includes(normalizedSearch) || normalizeString(value2).includes(normalizedSearch);
-        });
-
-        if (filteredExifData.length === 0) {
-            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
-            return;
-        }
+        };
         
-        // Render comparison header
-        const header = document.createElement('div');
-        header.className = 'flex items-center justify-between text-sm text-gray-500 px-4 pt-2 font-bold';
-        header.innerHTML = `
-            <span class="w-1/3">Tag Name</span>
-            <span class="w-1/3 text-center">File 1</span>
-            <span class="w-1/3 text-center">File 2</span>
-        `;
-        exifViewerContainer.appendChild(header);
-
-        filteredExifData.forEach(([key, values]) => {
-            const rowDiv = document.createElement('div');
-            rowDiv.className = 'flex flex-col py-2 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200';
+        // Calls the Gemini API for a comparison explanation.
+        const getComparisonExplanation = async (tagName, value1, value2, explanationDiv) => {
+            explanationDiv.innerHTML = `<p class="italic">Generating explanation...</p>`;
             
-            const value1 = values[0] !== undefined ? (typeof values[0] === 'object' ? JSON.stringify(values[0], null, 2) : values[0]) : 'N/A';
-            const value2 = values[1] !== undefined ? (typeof values[1] === 'object' ? JSON.stringify(values[1], null, 2) : values[1]) : 'N/A';
-            const isDifferent = value1 !== value2;
-            const isMakerNote = key === 'MakerNote';
+            const prompt = `Explain the EXIF tag named "${tagName}" in the context of image metadata comparison, with values "${value1}" and "${value2}". Highlight the differences if any. Provide a concise, easy-to-understand explanation. Use markdown for formatting, including bold, italics, or bullet points where appropriate. Ensure there is a blank line between each paragraph to improve readability.`;
+            try {
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                const response = await fetchWithTimeout(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0) {
+                    const formattedHtml = marked.parse(result.candidates[0].content.parts[0].text);
+                    explanationDiv.innerHTML = formattedHtml;
+                } else {
+                    explanationDiv.innerHTML = `<p class="text-red-500">Sorry, I couldn't generate an explanation.</p>`;
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                explanationDiv.innerHTML = `<p class="text-red-500">An error occurred while generating the explanation.</p>`;
+            }
+        };
 
-            rowDiv.innerHTML = `
+        // Normalizes a string for case-insensitive, space-agnostic searching.
+        const normalizeString = (str) => String(str).toLowerCase().replace(/\s/g, '');
+
+        // Renders a single EXIF tag entry.
+        const renderExifTag = (tagName, tagValue) => {
+            const tagDiv = document.createElement('div');
+            tagDiv.className = 'flex flex-col py-2 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200';
+            
+            const isMakerNote = tagName === "MakerNote";
+            const displayValue = (typeof tagValue === 'object' && tagValue !== null) ? JSON.stringify(tagValue, null, 2) : String(tagValue);
+            
+            tagDiv.innerHTML = `
                 <div class="flex items-start justify-between">
                     <div class="flex items-center space-x-2 w-1/3">
-                        <span class="font-semibold">${key}</span>
+                        <span class="font-semibold text-gray-800 dark:text-gray-100">${tagName}</span>
                         <button class="explain-btn flex items-center text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200 rounded-full px-2 py-1 bg-indigo-100 dark:bg-indigo-900">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             Explain
                         </button>
                     </div>
-                    ${isMakerNote ? `
-                        <div class="w-1/3 text-sm break-words text-center">
-                            <div class="maker-note-collapsed-1">
-                                <span class="text-gray-600 dark:text-gray-300">[MakerNote]</span>
-                                <button class="toggle-maker-note-1 text-indigo-500 hover:underline">Expand</button>
+                    <div class="w-2/3 break-words text-sm text-gray-600 dark:text-gray-300">
+                        ${isMakerNote ? `
+                            <div class="maker-note-collapsed">
+                                <pre>[MakerNote data is large and complex.]</pre>
+                                <button class="toggle-maker-note text-indigo-500 hover:underline mt-1">Expand</button>
                             </div>
-                            <div class="maker-note-expanded-1 hidden">
-                                <button class="toggle-maker-note-1 text-indigo-500 hover:underline mb-2">Collapse</button>
-                                <pre class="whitespace-pre-wrap ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</pre>
+                            <div class="maker-note-expanded hidden">
+                                <button class="toggle-maker-note text-indigo-500 hover:underline mb-2">Collapse</button>
+                                <pre>${displayValue}</pre>
                             </div>
-                        </div>
-                        <div class="w-1/3 text-sm break-words text-center">
-                            <div class="maker-note-collapsed-2">
-                                <span class="text-gray-600 dark:text-gray-300">[MakerNote]</span>
-                                <button class="toggle-maker-note-2 text-indigo-500 hover:underline">Expand</button>
-                            </div>
-                            <div class="maker-note-expanded-2 hidden">
-                                <button class="toggle-maker-note-2 text-indigo-500 hover:underline mb-2">Collapse</button>
-                                <pre class="whitespace-pre-wrap ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</pre>
-                            </div>
-                        </div>
-                    ` : `
-                        <span class="w-1/3 text-sm break-words text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</span>
-                        <span class="w-1/3 text-sm break-words text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</span>
-                    `}
+                        ` : `
+                            <pre class="whitespace-pre-wrap">${displayValue}</pre>
+                        `}
+                    </div>
                 </div>
+                <div class="explanation-container"></div>
             `;
-            
-            const explainBtn = rowDiv.querySelector('.explain-btn');
+
+            const explainBtn = tagDiv.querySelector('.explain-btn');
             explainBtn.addEventListener('click', async () => {
-                let explanationDiv = rowDiv.querySelector('.explanation-container');
-                if (explanationDiv) {
+                let explanationDiv = tagDiv.querySelector('.explanation-container');
+                if (explanationDiv.textContent.trim() !== '') {
                     explanationDiv.classList.toggle('expanded');
-                } else {
-                    explanationDiv = document.createElement('div');
-                    explanationDiv.className = 'explanation-container p-4 mt-2 bg-indigo-50 dark:bg-indigo-900 rounded-lg text-sm text-gray-700 dark:text-gray-300';
-                    rowDiv.appendChild(explanationDiv);
-                    explanationDiv.classList.add('expanded');
-                    await getComparisonExplanation(key, value1, value2, explanationDiv);
+                    return;
                 }
+                explanationDiv.classList.add('expanded');
+                await getExplanation(tagName, tagValue, explanationDiv);
+            });
+            
+            const toggleButtons = tagDiv.querySelectorAll('.toggle-maker-note');
+            if (toggleButtons.length > 0) {
+                const collapsedDiv = tagDiv.querySelector('.maker-note-collapsed');
+                const expandedDiv = tagDiv.querySelector('.maker-note-expanded');
+                toggleButtons.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        collapsedDiv.classList.toggle('hidden');
+                        expandedDiv.classList.toggle('hidden');
+                    });
+                });
+            }
+            
+            return tagDiv;
+        };
+
+        // Renders the file metadata section
+        const renderMetadata = (metadata, isComparison = false, metadata2 = null) => {
+            metadataViewerContainer.innerHTML = '';
+            if (!metadata && !metadata2) return;
+
+            const metadataDiv = document.createElement('div');
+            metadataDiv.className = 'flex flex-col space-y-4 mb-6';
+            
+            const metadataKeys = ['name', 'size', 'type', 'sha256'];
+            
+            metadataKeys.forEach(key => {
+                const metadataRow = document.createElement('div');
+                metadataRow.className = 'flex items-center py-2 px-4 rounded-lg bg-gray-100 dark:bg-gray-700';
+                
+                let value1 = metadata[key] || 'N/A';
+                let value2 = metadata2 ? (metadata2[key] || 'N/A') : null;
+                
+                // Format size for readability
+                if (key === 'size') {
+                    value1 = formatBytes(value1);
+                    if (value2) value2 = formatBytes(value2);
+                }
+
+                if (isComparison) {
+                    const isDifferent = value1 !== value2;
+                    metadataRow.innerHTML = `
+                        <div class="flex items-start justify-between w-full">
+                            <span class="font-bold w-1/3">${key.charAt(0).toUpperCase() + key.slice(1)}:</span>
+                            <span class="w-1/3 text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</span>
+                            <span class="w-1/3 text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</span>
+                        </div>
+                    `;
+                } else {
+                    metadataRow.innerHTML = `
+                        <span class="font-bold w-1/3">${key.charAt(0).toUpperCase() + key.slice(1)}:</span>
+                        <span class="w-2/3 text-gray-600 dark:text-gray-300">${value1}</span>
+                    `;
+                }
+                metadataDiv.appendChild(metadataRow);
+            });
+            metadataViewerContainer.appendChild(metadataDiv);
+        };
+
+        // Helper function to format bytes for display
+        const formatBytes = (bytes, decimals = 2) => {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        };
+        
+        // Renders the EXIF comparison view.
+        const renderComparisonView = (searchQuery) => {
+            dataViewerContainer.innerHTML = '';
+            viewerTitle.innerText = 'EXIF Data Comparison';
+            searchInput.placeholder = 'Search EXIF data...';
+
+            renderMetadata(state.file1.metadata, true, state.file2.metadata);
+
+            const combinedExif = {};
+            const exif1 = state.file1.exif || {};
+            const exif2 = state.file2.exif || {};
+            const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
+
+            [...allKeys].sort().forEach(key => {
+                combinedExif[key] = [exif1[key], exif2[key]];
             });
 
-            // Add event listeners for the new buttons in comparison view
-            if (isMakerNote) {
-                rowDiv.querySelectorAll('.toggle-maker-note-1').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        rowDiv.querySelector('.maker-note-collapsed-1').classList.toggle('hidden');
-                        rowDiv.querySelector('.maker-note-expanded-1').classList.toggle('hidden');
-                    });
-                });
-                rowDiv.querySelectorAll('.toggle-maker-note-2').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        rowDiv.querySelector('.maker-note-collapsed-2').classList.toggle('hidden');
-                        rowDiv.querySelector('.maker-note-expanded-2').classList.toggle('hidden');
-                    });
-                });
+            const filteredExifData = Object.entries(combinedExif).filter(([key, values]) => {
+                const normalizedSearch = normalizeString(searchQuery);
+                if (!normalizedSearch) return true;
+                const value1 = values[0] !== undefined ? String(values[0]) : '';
+                const value2 = values[1] !== undefined ? String(values[1]) : '';
+                return normalizeString(key).includes(normalizedSearch) || normalizeString(value1).includes(normalizedSearch) || normalizeString(value2).includes(normalizedSearch);
+            });
+
+            if (filteredExifData.length === 0) {
+                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
+                return;
             }
+            
+            // Render comparison header
+            const header = document.createElement('div');
+            header.className = 'flex items-center justify-between text-sm text-gray-500 px-4 pt-2 font-bold';
+            header.innerHTML = `
+                <span class="w-1/3">Tag Name</span>
+                <span class="w-1/3 text-center">File 1</span>
+                <span class="w-1/3 text-center">File 2</span>
+            `;
+            dataViewerContainer.appendChild(header);
 
-            exifViewerContainer.appendChild(rowDiv);
-        });
-    };
+            filteredExifData.forEach(([key, values]) => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'flex flex-col py-2 px-4 rounded-lg bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors duration-200';
+                
+                const value1 = values[0] !== undefined ? (typeof values[0] === 'object' ? JSON.stringify(values[0], null, 2) : values[0]) : 'N/A';
+                const value2 = values[1] !== undefined ? (typeof values[1] === 'object' ? JSON.stringify(values[1], null, 2) : values[1]) : 'N/A';
+                const isDifferent = value1 !== value2;
+                const isMakerNote = key === 'MakerNote';
 
-    // Renders the EXIF data for a single file.
-    const renderSingleFileView = (fileIndex, searchQuery) => {
-        exifViewerContainer.innerHTML = '';
-        viewerTitle.innerText = `EXIF Data for File ${fileIndex}`;
-        searchInput.placeholder = 'Search EXIF data...';
-        const exifData = state[`file${fileIndex}`].exif;
-        
-        renderMetadata(state[`file${fileIndex}`].metadata);
+                rowDiv.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div class="flex items-center space-x-2 w-1/3">
+                            <span class="font-semibold">${key}</span>
+                            <button class="explain-btn flex items-center text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200 rounded-full px-2 py-1 bg-indigo-100 dark:bg-indigo-900">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Explain
+                            </button>
+                        </div>
+                        ${isMakerNote ? `
+                            <div class="w-1/3 text-sm break-words text-center">
+                                <div class="maker-note-collapsed-1">
+                                    <span class="text-gray-600 dark:text-gray-300">[MakerNote]</span>
+                                    <button class="toggle-maker-note-1 text-indigo-500 hover:underline">Expand</button>
+                                </div>
+                                <div class="maker-note-expanded-1 hidden">
+                                    <button class="toggle-maker-note-1 text-indigo-500 hover:underline mb-2">Collapse</button>
+                                    <pre class="whitespace-pre-wrap ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</pre>
+                                </div>
+                            </div>
+                            <div class="w-1/3 text-sm break-words text-center">
+                                <div class="maker-note-collapsed-2">
+                                    <span class="text-gray-600 dark:text-gray-300">[MakerNote]</span>
+                                    <button class="toggle-maker-note-2 text-indigo-500 hover:underline">Expand</button>
+                                </div>
+                                <div class="maker-note-expanded-2 hidden">
+                                    <button class="toggle-maker-note-2 text-indigo-500 hover:underline mb-2">Collapse</button>
+                                    <pre class="whitespace-pre-wrap ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</pre>
+                                </div>
+                            </div>
+                        ` : `
+                            <span class="w-1/3 text-sm break-words text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value1}</span>
+                            <span class="w-1/3 text-sm break-words text-center ${isDifferent ? 'text-red-500' : 'text-gray-600 dark:text-gray-300'}">${value2}</span>
+                        `}
+                    </div>
+                `;
+                
+                const explainBtn = rowDiv.querySelector('.explain-btn');
+                explainBtn.addEventListener('click', async () => {
+                    let explanationDiv = rowDiv.querySelector('.explanation-container');
+                    if (!explanationDiv) {
+                        explanationDiv = document.createElement('div');
+                        explanationDiv.className = 'explanation-container p-4 mt-2 bg-indigo-50 dark:bg-indigo-900 rounded-lg text-sm text-gray-700 dark:text-gray-300';
+                        rowDiv.appendChild(explanationDiv);
+                    }
+                    explanationDiv.classList.toggle('expanded');
+                    if (explanationDiv.classList.contains('expanded')) {
+                        await getComparisonExplanation(key, value1, value2, explanationDiv);
+                    }
+                });
 
-        if (!exifData || Object.keys(exifData).length === 0) {
-            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF data found for this file.</p>';
-            return;
-        }
-
-        const filteredExifData = Object.entries(exifData).filter(([key, value]) => {
-            const normalizedSearch = normalizeString(searchQuery);
-            if (!normalizedSearch) return true;
-            return normalizeString(key).includes(normalizedSearch) || normalizeString(value).includes(normalizedSearch);
-        });
-        
-        if (filteredExifData.length === 0) {
-            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
-            return;
-        }
-
-        filteredExifData.forEach(([key, value]) => {
-            const tagElement = renderExifTag(key, value);
-            exifViewerContainer.appendChild(tagElement);
-        });
-    };
-
-    // Renders loaded JSON data.
-    const renderJsonView = (searchQuery) => {
-        exifViewerContainer.innerHTML = '';
-        metadataViewerContainer.innerHTML = ''; // Clear metadata view
-        viewerTitle.innerText = 'Loaded JSON Data';
-        searchInput.placeholder = 'Search JSON data...';
-        
-        if (!state.jsonData) {
-            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No JSON data loaded.</p>';
-            return;
-        }
-
-        const jsonDataString = JSON.stringify(state.jsonData, null, 2);
-        const filteredJsonData = jsonDataString.split('\n').filter(line => normalizeString(line).includes(normalizeString(searchQuery))).join('\n');
-
-        const pre = document.createElement('pre');
-        pre.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg whitespace-pre-wrap';
-        pre.textContent = filteredJsonData;
-        exifViewerContainer.appendChild(pre);
-    };
-
-    // Main render function, called on state change.
-    const render = () => {
-        resultsContainer.classList.remove('hidden');
-        const searchQuery = searchInput.value;
-        if (state.currentMode === 'single1') {
-            renderSingleFileView(1, searchQuery);
-        } else if (state.currentMode === 'single2') {
-            renderSingleFileView(2, searchQuery);
-        } else if (state.currentMode === 'compare') {
-            renderComparisonView(searchQuery);
-        } else if (state.currentMode === 'json') {
-            renderJsonView(searchQuery);
-        } else {
-            exifViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Select an option to view data.</p>';
-        }
-    };
-    
-    // Download logic
-    const createReportContent = (format) => {
-        if (!['single1', 'single2', 'compare'].includes(state.currentMode)) {
-            return '';
-        }
-        
-        const formatValue = (value) => {
-            if (typeof value === 'object' && value !== null) {
-                return JSON.stringify(value, null, 2);
-            }
-            return String(value);
-        };
-        
-        let content = '';
-
-        const getFilteredExif = (exifData) => {
-            const filtered = {};
-            // Make sure exifData is not null or undefined
-            if (!exifData) return filtered;
-            for (const key in exifData) {
-                // Filter out MakerNote and other potentially large or complex tags
-                if (key !== 'MakerNote') {
-                    filtered[key] = exifData[key];
+                if (isMakerNote) {
+                    rowDiv.querySelectorAll('.toggle-maker-note-1').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            rowDiv.querySelector('.maker-note-collapsed-1').classList.toggle('hidden');
+                            rowDiv.querySelector('.maker-note-expanded-1').classList.toggle('hidden');
+                        });
+                    });
+                    rowDiv.querySelectorAll('.toggle-maker-note-2').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            rowDiv.querySelector('.maker-note-collapsed-2').classList.toggle('hidden');
+                            rowDiv.querySelector('.maker-note-expanded-2').classList.toggle('hidden');
+                        });
+                    });
                 }
-            }
-            return filtered;
+                dataViewerContainer.appendChild(rowDiv);
+            });
         };
 
-        if (state.currentMode === 'single1') {
-            if (!state.file1.exif) return '';
-            const fileData = state.file1;
-            const filteredExif = getFilteredExif(fileData.exif);
+        // Renders the EXIF data for a single file.
+        const renderSingleFileView = (fileIndex, searchQuery) => {
+            dataViewerContainer.innerHTML = '';
+            viewerTitle.innerText = `EXIF Data for File ${fileIndex}`;
+            searchInput.placeholder = 'Search EXIF data...';
+            const exifData = state[`file${fileIndex}`].exif;
             
-            if (format === 'txt') {
-                content += `--- EXIF Report for ${fileData.metadata.name} ---\n\n`;
-                for (const [key, value] of Object.entries(filteredExif)) {
-                    content += `${key}: ${formatValue(value)}\n`;
-                }
-            } else if (format === 'csv') {
-                content += 'Tag,Value\n';
-                for (const [key, value] of Object.entries(filteredExif)) {
-                    content += `"${key}","${formatValue(value).replace(/"/g, '""')}"\n`;
-                }
+            renderMetadata(state[`file${fileIndex}`].metadata);
+
+            if (!exifData || Object.keys(exifData).length === 0) {
+                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF data found for this file.</p>';
+                return;
             }
 
-        } else if (state.currentMode === 'single2') {
-            if (!state.file2.exif) return '';
-            const fileData = state.file2;
-            const filteredExif = getFilteredExif(fileData.exif);
+            const filteredExifData = Object.entries(exifData).filter(([key, value]) => {
+                const normalizedSearch = normalizeString(searchQuery);
+                if (!normalizedSearch) return true;
+                return normalizeString(key).includes(normalizedSearch) || normalizeString(value).includes(normalizedSearch);
+            });
             
-            if (format === 'txt') {
-                content += `--- EXIF Report for ${fileData.metadata.name} ---\n\n`;
-                for (const [key, value] of Object.entries(filteredExif)) {
-                    content += `${key}: ${formatValue(value)}\n`;
-                }
-            } else if (format === 'csv') {
-                content += 'Tag,Value\n';
-                for (const [key, value] of Object.entries(filteredExif)) {
-                    content += `"${key}","${formatValue(value).replace(/"/g, '""')}"\n`;
-                }
+            if (filteredExifData.length === 0) {
+                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No EXIF tags match your search.</p>';
+                return;
             }
-        } else if (state.currentMode === 'compare') {
-            if (!state.file1.exif || !state.file2.exif) return '';
-            const exif1 = getFilteredExif(state.file1.exif);
-            const exif2 = getFilteredExif(state.file2.exif);
-            const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
+
+            filteredExifData.forEach(([key, value]) => {
+                const tagElement = renderExifTag(key, value);
+                dataViewerContainer.appendChild(tagElement);
+            });
+        };
+
+        // Renders loaded JSON data.
+        const renderJsonView = (fileIndex, searchQuery) => {
+            dataViewerContainer.innerHTML = '';
+            metadataViewerContainer.innerHTML = '';
+            viewerTitle.innerText = `JSON Data for File ${fileIndex}`;
+            searchInput.placeholder = 'Search JSON data...';
             
-            if (format === 'txt') {
-                content += '--- EXIF Comparison Report ---\n\n';
-                for (const key of [...allKeys].sort()) {
-                    const value1 = exif1[key] !== undefined ? formatValue(exif1[key]) : 'N/A';
-                    const value2 = exif2[key] !== undefined ? formatValue(exif2[key]) : 'N/A';
-                    content += `${key}:\n  File 1: ${value1}\n  File 2: ${value2}\n\n`;
-                }
-            } else if (format === 'csv') {
-                content += 'Tag,File 1,File 2\n';
-                for (const key of [...allKeys].sort()) {
-                    const value1 = exif1[key] !== undefined ? formatValue(exif1[key]) : 'N/A';
-                    const value2 = exif2[key] !== undefined ? formatValue(exif2[key]) : 'N/A';
-                    content += `"${key}","${value1.replace(/"/g, '""')}","${value2.replace(/"/g, '""')}"\n`;
-                }
+            const jsonData = state[`file${fileIndex}`].jsonData;
+            if (!jsonData) {
+                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">No JSON data loaded.</p>';
+                return;
             }
-        }
+
+            const jsonDataString = JSON.stringify(jsonData, null, 2);
+            const filteredJsonData = jsonDataString.split('\n').filter(line => normalizeString(line).includes(normalizeString(searchQuery))).join('\n');
+
+            const pre = document.createElement('pre');
+            pre.className = 'p-4 bg-gray-50 dark:bg-gray-700 rounded-lg whitespace-pre-wrap';
+            pre.textContent = filteredJsonData;
+            dataViewerContainer.appendChild(pre);
+        };
+
+        // Main render function, called on state change.
+        const render = () => {
+            resultsContainer.classList.remove('hidden');
+            const searchQuery = searchInput.value;
+            if (state.currentMode === 'single1') {
+                renderSingleFileView(1, searchQuery);
+            } else if (state.currentMode === 'single2') {
+                renderSingleFileView(2, searchQuery);
+            } else if (state.currentMode === 'compare') {
+                renderComparisonView(searchQuery);
+            } else if (state.currentMode === 'json1') {
+                renderJsonView(1, searchQuery);
+            } else if (state.currentMode === 'json2') {
+                renderJsonView(2, searchQuery);
+            } else {
+                dataViewerContainer.innerHTML = '<p class="text-gray-500 text-center py-4">Select an option to view data.</p>';
+            }
+        };
         
-        return content;
-    };
-    
-    const downloadPdfReport = () => {
-        // --- FIX START ---
-        // Added checks to ensure the file and its exif data exist before proceeding.
-        if (state.currentMode === 'single1') {
-            if (!state.file1.file || !state.file1.exif) {
+        // Download logic
+        const createReportContent = (format) => {
+            if (!['single1', 'single2', 'compare'].includes(state.currentMode)) {
+                return '';
+            }
+            
+            const formatValue = (value) => {
+                if (typeof value === 'object' && value !== null) {
+                    return JSON.stringify(value, null, 2);
+                }
+                return String(value);
+            };
+            
+            let content = '';
+
+            const getFilteredExif = (exifData) => {
+                const filtered = {};
+                if (!exifData) return filtered;
+                for (const key in exifData) {
+                    if (key !== 'MakerNote') {
+                        filtered[key] = exifData[key];
+                    }
+                }
+                return filtered;
+            };
+
+            const fileIndex = state.currentMode === 'single1' ? 1 : 2;
+            if (state.currentMode.includes('single')) {
+                const fileData = state[`file${fileIndex}`];
+                if (!fileData.exif) return '';
+                const filteredExif = getFilteredExif(fileData.exif);
+                
+                if (format === 'txt') {
+                    content += `--- EXIF Report for ${fileData.metadata.name} ---\n\n`;
+                    for (const [key, value] of Object.entries(filteredExif)) {
+                        content += `${key}: ${formatValue(value)}\n`;
+                    }
+                } else if (format === 'csv') {
+                    content += 'Tag,Value\n';
+                    for (const [key, value] of Object.entries(filteredExif)) {
+                        content += `"${key}","${formatValue(value).replace(/"/g, '""')}"\n`;
+                    }
+                }
+            } else if (state.currentMode === 'compare') {
+                if (!state.file1.exif || !state.file2.exif) return '';
+                const exif1 = getFilteredExif(state.file1.exif);
+                const exif2 = getFilteredExif(state.file2.exif);
+                const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
+                
+                if (format === 'txt') {
+                    content += '--- EXIF Comparison Report ---\n\n';
+                    for (const key of [...allKeys].sort()) {
+                        const value1 = exif1[key] !== undefined ? formatValue(exif1[key]) : 'N/A';
+                        const value2 = exif2[key] !== undefined ? formatValue(exif2[key]) : 'N/A';
+                        content += `${key}:\n  File 1: ${value1}\n  File 2: ${value2}\n\n`;
+                    }
+                } else if (format === 'csv') {
+                    content += 'Tag,File 1,File 2\n';
+                    for (const key of [...allKeys].sort()) {
+                        const value1 = exif1[key] !== undefined ? formatValue(exif1[key]) : 'N/A';
+                        const value2 = exif2[key] !== undefined ? formatValue(exif2[key]) : 'N/A';
+                        content += `"${key}","${value1.replace(/"/g, '""')}","${value2.replace(/"/g, '""')}"\n`;
+                    }
+                }
+            }
+            
+            return content;
+        };
+
+        const downloadPdfReport = () => {
+            const file1DataExists = state.file1.file || state.file1.exif;
+            const file2DataExists = state.file2.file || state.file2.exif;
+
+            if (state.currentMode === 'single1' && !file1DataExists) {
                 showMessage("No EXIF data loaded for File 1 to generate a report.");
                 return;
-            }
-        } else if (state.currentMode === 'single2') {
-            if (!state.file2.file || !state.file2.exif) {
+            } else if (state.currentMode === 'single2' && !file2DataExists) {
                 showMessage("No EXIF data loaded for File 2 to generate a report.");
                 return;
-            }
-        } else if (state.currentMode === 'compare') {
-            if (!state.file1.file || !state.file1.exif || !state.file2.file || !state.file2.exif) {
+            } else if (state.currentMode === 'compare' && (!file1DataExists || !file2DataExists)) {
                 showMessage("EXIF data for both files is required for a comparison report.");
                 return;
+            } else if (state.currentMode.includes('json')) {
+                showMessage("PDF reports are not available for JSON data.");
+                return;
+            } else if (state.currentMode === 'none') {
+                 showMessage("Please select a file or comparison view before generating a PDF.");
+                return;
             }
-        } else {
-            showMessage("Please select a file or comparison view before generating a PDF.");
-            return;
-        }
-        // --- FIX END ---
 
-        showMessage('Generating PDF...');
+            showMessage('Generating PDF...');
 
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        let y = 20;
-        const margin = 10;
-        const lineHeight = 7;
-        const maxLineWidth = doc.internal.pageSize.width - margin * 2;
-        
-        const checkPage = () => {
-            if (y > doc.internal.pageSize.height - margin - lineHeight) {
-                doc.addPage();
-                y = margin;
-            }
-        };
-
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(16);
-        doc.text(`EXIF Report: ${state.currentMode.toUpperCase()}`, margin, y);
-        y += lineHeight * 2;
-        
-        const getFilteredExif = (exifData) => {
-            const filtered = {};
-            if (!exifData) return filtered;
-            for (const key in exifData) {
-                if (key !== 'MakerNote') {
-                    filtered[key] = exifData[key];
-                }
-            }
-            return filtered;
-        };
-
-        if (state.currentMode === 'single1' || state.currentMode === 'single2') {
-            const fileData = state[state.currentMode === 'single1' ? 'file1' : 'file2'];
-            const filteredExif = getFilteredExif(fileData.exif);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            let y = 20;
+            const margin = 10;
+            const lineHeight = 7;
+            const maxLineWidth = doc.internal.pageSize.width - margin * 2;
             
-            doc.setFontSize(12); doc.text(`File: ${fileData.metadata.name}`, margin, y); y += lineHeight;
-            doc.text(`Size: ${formatBytes(fileData.metadata.size)}`, margin, y); y += lineHeight;
-            doc.text(`Type: ${fileData.metadata.type}`, margin, y); y += lineHeight * 2;
+            const checkPage = () => {
+                if (y > doc.internal.pageSize.height - margin - lineHeight) {
+                    doc.addPage();
+                    y = margin;
+                }
+            };
 
-            for (const [key, value] of Object.entries(filteredExif)) {
-                checkPage();
-                doc.setFont('helvetica', 'bold');
-                doc.text(`${key}: `, margin, y);
-                doc.setFont('helvetica', 'normal');
-                const valueText = (typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value));
-                const lines = doc.splitTextToSize(valueText, maxLineWidth - doc.getTextWidth(`${key}: `));
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.text(`EXIF Report: ${state.currentMode.toUpperCase()}`, margin, y);
+            y += lineHeight * 2;
+            
+            const getFilteredExif = (exifData) => {
+                const filtered = {};
+                if (!exifData) return filtered;
+                for (const key in exifData) {
+                    if (key !== 'MakerNote') {
+                        filtered[key] = exifData[key];
+                    }
+                }
+                return filtered;
+            };
+
+            if (state.currentMode === 'single1' || state.currentMode === 'single2') {
+                const fileData = state[state.currentMode === 'single1' ? 'file1' : 'file2'];
+                const filteredExif = getFilteredExif(fileData.exif);
                 
-                doc.text(lines[0], margin + doc.getTextWidth(`${key}: `), y);
-                for (let i = 1; i < lines.length; i++) {
+                doc.setFontSize(12); doc.text(`File: ${fileData.metadata.name}`, margin, y); y += lineHeight;
+                doc.text(`Size: ${formatBytes(fileData.metadata.size)}`, margin, y); y += lineHeight;
+                doc.text(`Type: ${fileData.metadata.type}`, margin, y); y += lineHeight * 2;
+
+                for (const [key, value] of Object.entries(filteredExif)) {
+                    checkPage();
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${key}: `, margin, y);
+                    doc.setFont('helvetica', 'normal');
+                    const valueText = (typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value));
+                    const lines = doc.splitTextToSize(valueText, maxLineWidth - doc.getTextWidth(`${key}: `));
+                    
+                    doc.text(lines[0], margin + doc.getTextWidth(`${key}: `), y);
+                    for (let i = 1; i < lines.length; i++) {
+                        y += lineHeight;
+                        doc.text(lines[i], margin + doc.getTextWidth(`${key}: `), y);
+                    }
                     y += lineHeight;
-                    doc.text(lines[i], margin + doc.getTextWidth(`${key}: `), y);
                 }
-                y += lineHeight;
-            }
 
-        } else if (state.currentMode === 'compare') {
-            const exif1 = getFilteredExif(state.file1.exif);
-            const exif2 = getFilteredExif(state.file2.exif);
-            const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
-            
-            for (const key of [...allKeys].sort()) {
-                const value1 = exif1[key] !== undefined ? exif1[key] : 'N/A';
-                const value2 = exif2[key] !== undefined ? exif2[key] : 'N/A';
-                const value1Text = (typeof value1 === 'object' ? JSON.stringify(value1, null, 2) : String(value1));
-                const value2Text = (typeof value2 === 'object' ? JSON.stringify(value2, null, 2) : String(value2));
-
-                checkPage();
-                doc.setFont('helvetica', 'bold');
-                doc.text(`${key}:`, margin, y);
+            } else if (state.currentMode === 'compare') {
+                const exif1 = getFilteredExif(state.file1.exif);
+                const exif2 = getFilteredExif(state.file2.exif);
+                const allKeys = new Set([...Object.keys(exif1), ...Object.keys(exif2)]);
                 
-                doc.setFont('helvetica', 'normal');
-                y += lineHeight;
-                checkPage();
-                doc.text(`File 1: ${value1Text}`, margin + 5, y);
-                y += lineHeight;
-                checkPage();
-                doc.text(`File 2: ${value2Text}`, margin + 5, y);
-                y += lineHeight;
+                for (const key of [...allKeys].sort()) {
+                    const value1 = exif1[key] !== undefined ? exif1[key] : 'N/A';
+                    const value2 = exif2[key] !== undefined ? exif2[key] : 'N/A';
+                    const value1Text = (typeof value1 === 'object' ? JSON.stringify(value1, null, 2) : String(value1));
+                    const value2Text = (typeof value2 === 'object' ? JSON.stringify(value2, null, 2) : String(value2));
+
+                    checkPage();
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(`${key}:`, margin, y);
+                    
+                    doc.setFont('helvetica', 'normal');
+                    y += lineHeight;
+                    checkPage();
+                    doc.text(`File 1: ${value1Text}`, margin + 5, y);
+                    y += lineHeight;
+                    checkPage();
+                    doc.text(`File 2: ${value2Text}`, margin + 5, y);
+                    y += lineHeight;
+                }
             }
-        }
+            
+            const filename = `exif-report-${state.currentMode}-${new Date().toISOString().slice(0, 10)}.pdf`;
+            doc.save(filename);
+            showMessage('PDF report downloaded successfully.');
+        };
+
+        const downloadReport = async (format) => {
+            if (!['single1', 'single2', 'compare'].includes(state.currentMode)) {
+                showMessage("No data to download. Please display a file or comparison first.");
+                return;
+            }
+
+            const fileName = `exif-report-${state.currentMode}-${new Date().toISOString().slice(0, 10)}`;
+
+            if (format === 'txt') {
+                const content = createReportContent('txt');
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                saveAs(blob, `${fileName}.txt`);
+            } else if (format === 'csv') {
+                const content = createReportContent('csv');
+                const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
+                saveAs(blob, `${fileName}.csv`);
+            } else if (format === 'zip') {
+                const zip = new JSZip();
+                const txtContent = createReportContent('txt');
+                if (txtContent) {
+                    zip.file(`${fileName}.txt`, txtContent);
+                }
+                const csvContent = createReportContent('csv');
+                if (csvContent) {
+                    zip.file(`${fileName}.csv`, csvContent);
+                }
+                if (Object.keys(zip.files).length > 0) {
+                    const content = await zip.generateAsync({ type: "blob" });
+                    saveAs(content, `${fileName}.zip`);
+                } else {
+                    showMessage("No data to include in the ZIP file.");
+                }
+            }
+        };
+
+        // --- New Functions for URL Loading ---
+        const loadImageFromUrl = async (url, fileIndex) => {
+            if (!url) {
+                showMessage(`Please enter a valid image URL for File ${fileIndex}.`);
+                return;
+            }
+            try {
+                const response = await fetchWithTimeout(url);
+                const blob = await response.blob();
+                const file = new File([blob], url.split('/').pop() || 'image-from-url.jpg', { type: blob.type });
+
+                // Process file to get metadata and EXIF data
+                const [metadata, exifData] = await Promise.all([
+                    getFileMetadata(file, url),
+                    new Promise(resolve => {
+                        EXIF.getData(file, function() {
+                            resolve(EXIF.getAllTags(this) || {});
+                        });
+                    })
+                ]);
+
+                const fileData = state[`file${fileIndex}`];
+                fileData.file = file;
+                fileData.metadata = metadata;
+                fileData.exif = exifData;
+                fileData.jsonData = null;
+                showMessage(`Image data loaded successfully for File ${fileIndex}.`);
+
+            } catch (error) {
+                console.error("Error loading image from URL:", error);
+                let errorMessage = `Error loading image from URL. This is often due to a Cross-Origin Resource Sharing (CORS) policy on the server, which prevents your browser from accessing the data.`;
+                if (error.name === 'AbortError' || error.message.includes('timed out')) {
+                    errorMessage = `Image request timed out. The server might be slow or unresponsive.`;
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = `Failed to fetch data. This is likely due to a CORS policy preventing access.`;
+                }
+                showMessage(errorMessage);
+            }
+        };
+
+        const loadJsonFromUrl = async (url, fileIndex) => {
+            if (!url) {
+                showMessage(`Please enter a valid JSON API URL for File ${fileIndex}.`);
+                return;
+            }
+            try {
+                const response = await fetchWithTimeout(url);
+                const jsonData = await response.json();
+                
+                const fileData = state[`file${fileIndex}`];
+                fileData.jsonData = jsonData;
+                fileData.file = null;
+                fileData.metadata = {};
+                fileData.exif = {};
+
+                showMessage(`JSON data loaded successfully for File ${fileIndex}.`);
+            } catch (error) {
+                console.error("Error loading JSON from URL:", error);
+                let errorMessage = `Error loading JSON data. This is often due to a Cross-Origin Resource Sharing (CORS) policy on the server, which prevents your browser from accessing the data.`;
+                if (error.name === 'AbortError' || error.message.includes('timed out')) {
+                    errorMessage = `API request timed out. The server might be slow or unresponsive.`;
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMessage = `Failed to fetch data. This is likely due to a CORS policy preventing access.`;
+                }
+                showMessage(errorMessage);
+            }
+        };
+
+
+        // --- Event Listeners ---
         
-        const filename = `exif-report-${state.currentMode}-${new Date().toISOString().slice(0, 10)}.pdf`;
-        doc.save(filename);
-        showMessage('PDF report downloaded successfully.');
-    };
+        // Input type change listeners
+        file1InputType.addEventListener('change', (e) => {
+            state.file1.sourceType = e.target.value;
+            file1LocalInputDiv.classList.toggle('hidden', e.target.value !== 'local');
+            file1ImageUrlDiv.classList.toggle('hidden', e.target.value !== 'image-url');
+            file1JsonUrlDiv.classList.toggle('hidden', e.target.value !== 'json-url');
+        });
+        file2InputType.addEventListener('change', (e) => {
+            state.file2.sourceType = e.target.value;
+            file2LocalInputDiv.classList.toggle('hidden', e.target.value !== 'local');
+            file2ImageUrlDiv.classList.toggle('hidden', e.target.value !== 'image-url');
+            file2JsonUrlDiv.classList.toggle('hidden', e.target.value !== 'json-url');
+        });
 
-    const downloadReport = async (format) => {
-        if (!['single1', 'single2', 'compare'].includes(state.currentMode)) {
-            showMessage("No data to download. Please display a file or comparison first.");
-            return;
-        }
-
-        const fileName = `exif-report-${state.currentMode}-${new Date().toISOString().slice(0, 10)}`;
-
-        if (format === 'txt') {
-            const content = createReportContent('txt');
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            saveAs(blob, `${fileName}.txt`);
-        } else if (format === 'csv') {
-            const content = createReportContent('csv');
-            const blob = new Blob([content], { type: 'text/csv;charset=utf-8' });
-            saveAs(blob, `${fileName}.csv`);
-        } else if (format === 'zip') {
-            const zip = new JSZip();
-            const txtContent = createReportContent('txt');
-            if (txtContent) {
-                zip.file(`${fileName}.txt`, txtContent);
+        // Load buttons
+        loadFile1Btn.addEventListener('click', async () => {
+            const sourceType = state.file1.sourceType;
+            if (sourceType === 'local') {
+                const file = file1Input.files[0];
+                if (!file) { showMessage("Please select a local file."); return; }
+                showMessage("Loading File 1 metadata...");
+                const [metadata, exifData] = await Promise.all([
+                    getFileMetadata(file),
+                    new Promise(resolve => EXIF.getData(file, function() { resolve(EXIF.getAllTags(this) || {}); }))
+                ]);
+                state.file1.file = file;
+                state.file1.metadata = metadata;
+                state.file1.exif = exifData;
+                state.file1.jsonData = null;
+                showMessage("File 1 metadata and EXIF data loaded.");
+            } else if (sourceType === 'image-url') {
+                const url = file1ImageUrl.value;
+                showMessage("Loading image from URL for File 1...");
+                await loadImageFromUrl(url, 1);
+            } else if (sourceType === 'json-url') {
+                const url = file1JsonUrl.value;
+                showMessage("Loading JSON from URL for File 1...");
+                await loadJsonFromUrl(url, 1);
             }
-            const csvContent = createReportContent('csv');
-            if (csvContent) {
-                zip.file(`${fileName}.csv`, csvContent);
+        });
+
+        loadFile2Btn.addEventListener('click', async () => {
+            const sourceType = state.file2.sourceType;
+            if (sourceType === 'local') {
+                const file = file2Input.files[0];
+                if (!file) { showMessage("Please select a local file."); return; }
+                showMessage("Loading File 2 metadata...");
+                const [metadata, exifData] = await Promise.all([
+                    getFileMetadata(file),
+                    new Promise(resolve => EXIF.getData(file, function() { resolve(EXIF.getAllTags(this) || {}); }))
+                ]);
+                state.file2.file = file;
+                state.file2.metadata = metadata;
+                state.file2.exif = exifData;
+                state.file2.jsonData = null;
+                showMessage("File 2 metadata and EXIF data loaded.");
+            } else if (sourceType === 'image-url') {
+                const url = file2ImageUrl.value;
+                showMessage("Loading image from URL for File 2...");
+                await loadImageFromUrl(url, 2);
+            } else if (sourceType === 'json-url') {
+                const url = file2JsonUrl.value;
+                showMessage("Loading JSON from URL for File 2...");
+                await loadJsonFromUrl(url, 2);
             }
-            if (Object.keys(zip.files).length > 0) {
-                const content = await zip.generateAsync({ type: "blob" });
-                saveAs(content, `${fileName}.zip`);
+        });
+
+        // Display buttons
+        displayFile1Btn.addEventListener('click', () => {
+            const fileData = state.file1;
+            if (!fileData.file && !fileData.jsonData) {
+                showMessage("Please load data for File 1 first.");
+                return;
+            }
+            if (fileData.jsonData) {
+                state.currentMode = 'json1';
             } else {
-                showMessage("No data to include in the ZIP file.");
+                state.currentMode = 'single1';
             }
-        }
-    };
-    
-    // Function to handle loading JSON from a URL with validation
-    const processJsonUrl = async (url) => {
-        if (!url || !URL.canParse(url)) {
-            showMessage("Please enter a valid JSON API URL (e.g., https://api.example.com/data).");
-            return;
-        }
+            render();
+        });
         
-        try {
-            const response = await fetchWithTimeout(url);
-            state.jsonData = await response.json();
-            showMessage("JSON data loaded successfully. Click 'Display Loaded JSON' to view it.");
-        } catch (error) {
-            console.error("Error loading JSON from URL:", error);
-            let errorMessage = `Error loading JSON data. This is often due to a Cross-Origin Resource Sharing (CORS) policy on the server, which prevents your browser from accessing the data.`;
-            if (error.name === 'AbortError' || error.message.includes('timed out')) {
-                errorMessage = `API request timed out. The server might be slow or unresponsive.`;
-            } else if (error.message.includes('Failed to fetch')) {
-                errorMessage = `Failed to fetch data. This is likely due to a CORS policy preventing access.`;
+        displayFile2Btn.addEventListener('click', () => {
+            const fileData = state.file2;
+            if (!fileData.file && !fileData.jsonData) {
+                showMessage("Please load data for File 2 first.");
+                return;
             }
-            showMessage(errorMessage);
-        }
-    };
+            if (fileData.jsonData) {
+                state.currentMode = 'json2';
+            } else {
+                state.currentMode = 'single2';
+            }
+            render();
+        });
 
+        compareFilesBtn.addEventListener('click', () => {
+            if (!state.file1.file || !state.file2.file) {
+                showMessage("Please load image data for both File 1 and File 2 to compare them.");
+                return;
+            }
+            state.currentMode = 'compare';
+            render();
+        });
 
-    // --- Event Listeners ---
-    file1Input.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        // Show loading message
-        showMessage("Loading File 1 metadata...");
-        
-        // Use Promise.all to fetch both EXIF and other metadata in parallel
-        const [metadata, exifData] = await Promise.all([
-            getFileMetadata(file),
-            new Promise(resolve => {
-                EXIF.getData(file, function() {
-                    resolve(EXIF.getAllTags(this) || {});
-                });
-            })
-        ]);
-        
-        state.file1.file = file;
-        state.file1.metadata = metadata;
-        state.file1.exif = exifData;
+        // Download buttons
+        downloadTxtBtn.addEventListener('click', () => downloadReport('txt'));
+        downloadCsvBtn.addEventListener('click', () => downloadReport('csv'));
+        downloadPdfBtn.addEventListener('click', downloadPdfReport);
+        downloadZipBtn.addEventListener('click', () => downloadReport('zip'));
 
-        showMessage("File 1 metadata and EXIF data loaded.");
-    });
-
-    file2Input.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+        // Search input listener
+        searchInput.addEventListener('input', () => {
+            render(); // Rerender on every search input change
+        });
         
-        showMessage("Loading File 2 metadata...");
-        
-        const [metadata, exifData] = await Promise.all([
-            getFileMetadata(file),
-            new Promise(resolve => {
-                EXIF.getData(file, function() {
-                    resolve(EXIF.getAllTags(this) || {});
-                });
-            })
-        ]);
-        
-        state.file2.file = file;
-        state.file2.metadata = metadata;
-        state.file2.exif = exifData;
-        
-        showMessage("File 2 metadata and EXIF data loaded.");
+        render(); // Initial render
     });
-    
-    displayFile1Btn.addEventListener('click', () => {
-        if (!state.file1.file) {
-            showMessage("Please upload a file for File 1 first.");
-            return;
-        }
-        state.currentMode = 'single1';
-        render();
-    });
-    
-    displayFile2Btn.addEventListener('click', () => {
-        if (!state.file2.file) {
-            showMessage("Please upload a file for File 2 first.");
-            return;
-        }
-        state.currentMode = 'single2';
-        render();
-    });
-    
-    loadJsonBtn.addEventListener('click', () => processJsonUrl(jsonUrlInput.value));
-    
-    displayJsonBtn.addEventListener('click', () => {
-        if (!state.jsonData) {
-            showMessage("No JSON data loaded. Please load data from an API first.");
-            return;
-        }
-        state.currentMode = 'json';
-        render();
-    });
-
-    compareFilesBtn.addEventListener('click', () => {
-        if (!state.file1.file || !state.file2.file) {
-            showMessage("Please load data for both File 1 and File 2 to compare them.");
-            return;
-        }
-        state.currentMode = 'compare';
-        render();
-    });
-
-    // Download buttons
-    downloadTxtBtn.addEventListener('click', () => downloadReport('txt'));
-    downloadCsvBtn.addEventListener('click', () => downloadReport('csv'));
-    downloadPdfBtn.addEventListener('click', downloadPdfReport);
-    downloadZipBtn.addEventListener('click', () => downloadReport('zip'));
-
-    // Search input listener
-    searchInput.addEventListener('input', () => {
-        render(); // Rerender on every search input change
-    });
-    
-    render(); // Initial render
-});
 </script>
 
 </body>
